@@ -78,6 +78,88 @@ public class EnergiaBoard {
         random = new Random();
     }
 
+    private double calculaCoste(int indexCentral){
+        //La central no ha producido
+        if(energiaPendiente.get(indexCentral)==centrales.get(indexCentral).getProduccion()){
+            return switch (centrales.get(indexCentral).getTipo()) {
+                case Central.CENTRALA -> 15000.0;
+                case Central.CENTRALB -> 5000.0;
+                case Central.CENTRALC -> 1500.0;
+                default -> 0.0;
+            };
+        }
+        else{
+            return switch (centrales.get(indexCentral).getTipo()) {
+                case Central.CENTRALA -> centrales.get(indexCentral).getProduccion()*50 + 20000;
+                case Central.CENTRALB -> centrales.get(indexCentral).getProduccion()*80 + 10000;
+                case Central.CENTRALC -> centrales.get(indexCentral).getProduccion()*150 + 5000;
+                default -> 0.0;
+            };
+        }
+    }
+
+    private double calculaIngreso(int indexCentral){
+        double ingresos = 0.0;
+        for(int i =0; i<nGarantizados; ++i) {
+            if(asignacionG.get(i)==indexCentral){
+                switch (clientesG.get(i).getTipo()) {
+                    case Cliente.CLIENTEXG -> ingresos += 400.0*clientesG.get(i).getConsumo();
+                    case Cliente.CLIENTEMG -> ingresos += 500.0*clientesG.get(i).getConsumo();
+                    case Cliente.CLIENTEG -> ingresos += 600.0*clientesG.get(i).getConsumo();
+                    default -> ingresos += 0.0;
+                }
+            }
+        }
+
+        for(int i =0; i<nNoGarantizados; ++i) {
+            if(asignacionNG.get(i)==indexCentral){
+                switch (clientesNoG.get(i).getTipo()) {
+                    case Cliente.CLIENTEXG -> ingresos += 200.0*clientesNoG.get(i).getConsumo();
+                    case Cliente.CLIENTEMG -> ingresos += 400.0*clientesNoG.get(i).getConsumo();
+                    case Cliente.CLIENTEG -> ingresos += 500.0*clientesNoG.get(i).getConsumo();
+                    default -> ingresos += 0.0;
+                }
+            }
+        }
+
+        return ingresos;
+    }
+
+    private double calculaIndemnizacion(){
+        for(int i =0; i<nGarantizados; ++i){
+            if(asignacionG.get(i)==-1) return Double.MAX_VALUE;
+        }
+        double indemnizacion=0.0;
+        for(int i =0; i<nNoGarantizados; ++i){
+            if(asignacionNG.get(i)==-1) indemnizacion+=clientesNoG.get(i).getConsumo()*50.0;
+        }
+        return indemnizacion;
+    }
+
+    public double calculaBeneficios() {
+        double ingreso=0.0;
+        double coste=0.0;
+        for(int i=0; i<nCentrales; ++i){
+            ingreso += calculaIngreso(i);
+            coste += calculaCoste(i);
+        }
+        return ingreso - coste - calculaIndemnizacion();
+    }
+
+    private double calculaProduccionDistancia(Cliente cliente, Central central) {
+        double consumo = cliente.getConsumo();
+        double distancia = Math.sqrt(
+                Math.pow(cliente.getCoordX()-central.getCoordX(),2)+
+                Math.pow(cliente.getCoordY()-central.getCoordY(),2)
+        );
+
+        if(distancia <= 10) return consumo;
+        else if(distancia <= 25) return consumo * (0.1 + 1.0);
+        else if(distancia <= 50) return consumo * (0.2 + 1.0);
+        else if(distancia <= 75) return consumo * (0.4 + 1.0);
+        else return consumo * (0.6 + 1.0);
+    }
+
     public void generarEstadoInicial(int opt){
         switch (opt){
             //Caso 0: colocar clientes en una central mientras la potencia remanente sea > 0
@@ -86,9 +168,10 @@ public class EnergiaBoard {
                 int i = 0;
                 int indexCentral = 0;
                 while(i<nGarantizados && indexCentral<nCentrales){
-                    if(energiaPendiente.get(indexCentral)>=clientesG.get(i).getConsumo() * 10){
+                    double produccionCliente = calculaProduccionDistancia(clientesG.get(i),centrales.get(indexCentral));
+                    if(energiaPendiente.get(indexCentral)>=produccionCliente){
                         asignacionG.add(indexCentral);
-                        energiaActualizada = energiaPendiente.get(indexCentral) - clientesG.get(i).getConsumo() * 10;
+                        energiaActualizada = energiaPendiente.get(indexCentral) - produccionCliente;
                         energiaPendiente.set(indexCentral, energiaActualizada);
                         ++i;
                     }
@@ -107,9 +190,10 @@ public class EnergiaBoard {
                 else {
                     i=0;
                     while(i<nNoGarantizados && indexCentral<nCentrales){
-                        if(energiaPendiente.get(indexCentral)>=clientesNoG.get(i).getConsumo()){
+                        double produccionCliente = calculaProduccionDistancia(clientesNoG.get(i),centrales.get(indexCentral));
+                        if(energiaPendiente.get(indexCentral)>=produccionCliente){
                             asignacionNG.add(indexCentral);
-                            energiaActualizada = energiaPendiente.get(indexCentral) - clientesNoG.get(i).getConsumo();
+                            energiaActualizada = energiaPendiente.get(indexCentral) - produccionCliente;
                             energiaPendiente.set(indexCentral, energiaActualizada);
                             ++i;
                         }
