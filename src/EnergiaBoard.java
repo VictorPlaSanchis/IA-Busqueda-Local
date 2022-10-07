@@ -318,6 +318,16 @@ public class EnergiaBoard {
 
     }
 
+    public double calculaLogPotenciaRemanente() {
+        double potencia = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        return Math.log(potencia);
+    }
 
 
 }
