@@ -328,6 +328,20 @@ public class EnergiaBoard {
         }
         return Math.log(potencia);
     }
+    public double calculaCosteTransporte() {
+        double coste = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            if (asignacionG.get(i) != -1) {
+                coste += calculaProduccionDistancia(clientesG.get(i), centrales.get(asignacionG.get(i)));
+            }
+        }
+        for (int i = 0; i < nGarantizados; ++i) {
+            if (asignacionNG.get(i) != -1) {
+                coste += calculaProduccionDistancia(clientesNoG.get(i), centrales.get(asignacionNG.get(i)));
+            }
+        }
+        return coste;
+    }
 
 
 }
