@@ -180,6 +180,7 @@ public class EnergiaBoard {
     public double calculaBeneficios() {
         double ingreso=0.0;
         double coste=0.0;
+        //ANTES DE HACER ESTO PODRIAMOS MIRAR SI LA INDEMNIZACION ==MAX_DOUBLE Y NOS LO AHORRAMOS??
         for(int i=0; i<nCentrales; ++i){
             ingreso += calculaIngreso(i);
             coste += calculaCoste(i);
@@ -319,6 +320,7 @@ public class EnergiaBoard {
         Central c1 = centrales.get(indexCentral1);
         Central c2 = centrales.get(indexCentral2);
 
+        //OJO  TENDRIAMMOS QUE MIRARSI LA ASIGNACION ES -1!!!!
         double energiaP1 = energiaPendiente.get(indexCentral1);
         double energiaP2 = energiaPendiente.get(indexCentral2);
         double consumoC1 = calculaProduccionDistancia(cl1,c1);
