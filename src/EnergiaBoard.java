@@ -38,20 +38,8 @@ public class EnergiaBoard {
     //ArrayList para almacenar las centrales
     private static Centrales centrales;
 
-    private static int centralesSeed;
-
-    private static int[] tiposCentral;
-
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
-
-    private static int nClientes;
-
-    private static double[] propClientes;
-
-    private static double propGarant;
-
-    private static int clientesSeed;
 
     private static ArrayList<Cliente> clientesG;
 
@@ -64,32 +52,8 @@ public class EnergiaBoard {
 
     private Random random;
 
-    public EnergiaBoard(EnergiaBoard estado){
-        nCentrales = estado.nCentrales;
-        nGarantizados = estado.nGarantizados;
-        nNoGarantizados = estado.nNoGarantizados;
-        try {
-            centrales = new Centrales(estado.tiposCentral, estado.centralesSeed);
-            clientes = new Clientes(estado.nClientes, estado.propClientes, estado.propGarant, estado.clientesSeed);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e);
-        }
-        clientesG = new ArrayList<Cliente>(estado.clientesG);
-        clientesNoG = new ArrayList<Cliente>(estado.clientesNoG);
-        energiaPendiente = new ArrayList<Double>(estado.energiaPendiente);
-        asignacionG = new ArrayList<Integer>(estado.asignacionG);
-        asignacionNG = new ArrayList<Integer>(estado.asignacionNG);
-    }
-
     /** Crea una nueva instancia de EnergiaBoard */
     public EnergiaBoard(int[] cent, int centralesSeed, int ncl, double[] propc, double propg, int clientesSeed) {
-        this.centralesSeed = centralesSeed;
-        this.tiposCentral = cent;
-        this.nClientes = ncl;
-        this.propClientes = propc;
-        this.propGarant = propg;
-        this.clientesSeed = clientesSeed;
         try{
             centrales =  new Centrales(cent, centralesSeed);
             clientes = new Clientes(ncl, propc, propg, clientesSeed);
@@ -180,19 +144,22 @@ public class EnergiaBoard {
     public double calculaBeneficios() {
         double ingreso=0.0;
         double coste=0.0;
-        //ANTES DE HACER ESTO PODRIAMOS MIRAR SI LA INDEMNIZACION ==MAX_DOUBLE Y NOS LO AHORRAMOS??
+
+        double indemnizacion = calculaIndemnizacion();
+        if(indemnizacion==Double.MAX_VALUE) return -indemnizacion;
+
         for(int i=0; i<nCentrales; ++i){
             ingreso += calculaIngreso(i);
             coste += calculaCoste(i);
         }
-        return ingreso - coste - calculaIndemnizacion();
+        return ingreso - coste - indemnizacion;
     }
 
     private double calculaProduccionDistancia(Cliente cliente, Central central) {
         double consumo = cliente.getConsumo();
         double distancia = Math.sqrt(
                 Math.pow(cliente.getCoordX()-central.getCoordX(),2)+
-                Math.pow(cliente.getCoordY()-central.getCoordY(),2)
+                        Math.pow(cliente.getCoordY()-central.getCoordY(),2)
         );
 
         if(distancia <= 10) return consumo;
@@ -200,6 +167,11 @@ public class EnergiaBoard {
         else if(distancia <= 50) return consumo * (0.2 + 1.0);
         else if(distancia <= 75) return consumo * (0.4 + 1.0);
         else return consumo * (0.6 + 1.0);
+    }
+
+    public void printPanicMethod(){
+        System.out.println(asignacionG);
+
     }
 
     public void generarEstadoInicial(int opt){
@@ -299,34 +271,35 @@ public class EnergiaBoard {
 
     public boolean moveClient(Cliente cl1, int indexCliente, int indexCentral){
         Central cent = centrales.get(indexCentral);
-        if (cl1.getTipo()==Cliente.GARANTIZADO) {
-            //Se puede cambiar el cliente a la nueva central
+        if (cl1.getTipo()==Cliente.GARANTIZADO && indexCentral!=-1) {
             if(calculaProduccionDistancia(cl1,cent)<=energiaPendiente.get(indexCentral)) {
                 asignacionG.set(indexCliente, indexCentral);
                 return true;
             }
         }
-        else{
-            if(calculaProduccionDistancia(cl1,cent)<=energiaPendiente.get(indexCentral)) {
+        if(cl1.getTipo()==Cliente.NOGARANTIZADO){
+            if(indexCentral==-1 || calculaProduccionDistancia(cl1,cent)<=energiaPendiente.get(indexCentral)) {
                 asignacionNG.set(indexCliente, indexCentral);
                 return true;
             }
+
         }
-        //No se puede cambiar el cliente a la nueva central
         return false;
     }
 
     public boolean swapCliente(Cliente cl1, Cliente cl2, int indexCliente1, int indexCliente2, int indexCentral1, int indexCentral2){
-        Central c1 = centrales.get(indexCentral1);
-        Central c2 = centrales.get(indexCentral2);
 
-        //OJO  TENDRIAMMOS QUE MIRARSI LA ASIGNACION ES -1!!!!
-        double energiaP1 = energiaPendiente.get(indexCentral1);
-        double energiaP2 = energiaPendiente.get(indexCentral2);
-        double consumoC1 = calculaProduccionDistancia(cl1,c1);
-        double consumoC2 = calculaProduccionDistancia(cl2,c2);
+        Central c1 = indexCentral1==-1 ? null : centrales.get(indexCentral1);
+        Central c2 = indexCentral1==-1 ? null : centrales.get(indexCentral2);
+
+        double energiaP1 = indexCentral1==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral1);
+        double energiaP2 = indexCentral2==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral2);
+
+        double consumoC1 = c1==null ? 0.0 : calculaProduccionDistancia(cl1,c1);
+        double consumoC2 = c2==null ? 0.0 : calculaProduccionDistancia(cl2,c2);
 
         boolean swap = (energiaP2+consumoC2)>=consumoC1 && (energiaP1+consumoC1)>=consumoC2;
+        swap = swap && !((indexCentral1==-1 && cl2.getTipo()==Cliente.GARANTIZADO) || (indexCentral2==-1 && cl1.getTipo()==Cliente.GARANTIZADO));
 
         if(swap){
             if(cl1.getTipo()==Cliente.GARANTIZADO){
@@ -353,9 +326,6 @@ public class EnergiaBoard {
         }
         return false;
 
-    }
-    public boolean isGoalState() {
-        return false;
     }
 
     public double calculaLogPotenciaRemanente() {
@@ -411,5 +381,12 @@ public class EnergiaBoard {
         return Math.pow((coste + this.calculaIndemnizacion()), 2);
     }
 
+    public ArrayList<Integer> getGarantizados() {
+        return asignacionG;
+    }
+
+    public ArrayList<Integer> getNGarantizados() {
+        return asignacionNG;
+    }
 }
 
