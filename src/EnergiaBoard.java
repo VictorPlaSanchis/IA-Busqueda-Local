@@ -38,6 +38,8 @@ public class EnergiaBoard {
     //ArrayList para almacenar las centrales
     private static Centrales centrales;
 
+    private static int centralesSeed;
+
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
 
@@ -51,6 +53,8 @@ public class EnergiaBoard {
     private static ArrayList<Integer> asignacionNG;
 
     private Random random;
+
+
 
     /** Crea una nueva instancia de EnergiaBoard */
     public EnergiaBoard(int[] cent, int centralesSeed, int ncl, double[] propc, double propg, int clientesSeed) {
@@ -317,13 +321,16 @@ public class EnergiaBoard {
         return false;
 
     }
+    public boolean isGoalState() {
+        return false;
+    }
 
     public double calculaLogPotenciaRemanente() {
         double potencia = 0.0;
         for (int i = 0; i < nGarantizados; ++i) {
             potencia += energiaPendiente.get(asignacionG.get(i));
         }
-        for (int i = 0; i < nGarantizados; ++i) {
+        for (int i = 0; i < nNoGarantizados; ++i) {
             potencia += energiaPendiente.get(asignacionG.get(i));
         }
         return Math.log(potencia);
@@ -334,7 +341,7 @@ public class EnergiaBoard {
         for (int i = 0; i < nGarantizados; ++i) {
             potencia += energiaPendiente.get(asignacionG.get(i));
         }
-        for (int i = 0; i < nGarantizados; ++i) {
+        for (int i = 0; i < nNoGarantizados; ++i) {
             potencia += energiaPendiente.get(asignacionG.get(i));
         }
         return Math.pow(potencia, 2);
@@ -347,7 +354,7 @@ public class EnergiaBoard {
                 coste += calculaProduccionDistancia(clientesG.get(i), centrales.get(asignacionG.get(i)));
             }
         }
-        for (int i = 0; i < nGarantizados; ++i) {
+        for (int i = 0; i < nNoGarantizados; ++i) {
             if (asignacionNG.get(i) != -1) {
                 coste += calculaProduccionDistancia(clientesNoG.get(i), centrales.get(asignacionNG.get(i)));
             }
