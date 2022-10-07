@@ -328,6 +328,18 @@ public class EnergiaBoard {
         }
         return Math.log(potencia);
     }
+
+    public double calculaPowPotenciaRemanente() {
+        double potencia = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        return Math.pow(potencia, 2);
+    }
+
     public double calculaCosteTransporte() {
         double coste = 0.0;
         for (int i = 0; i < nGarantizados; ++i) {
@@ -343,6 +355,21 @@ public class EnergiaBoard {
         return coste;
     }
 
+    public double calculaLogCosteIndemnización(){
+        double coste=0.0;
+        for(int i=0; i<nCentrales; ++i){
+            coste += calculaCoste(i);
+        }
+        return Math.log(coste + this.calculaIndemnizacion());
+    }
+
+    public double calculaPowCosteIndemnización(){
+        double coste=0.0;
+        for(int i=0; i<nCentrales; ++i){
+            coste += calculaCoste(i);
+        }
+        return Math.pow((coste + this.calculaIndemnizacion()), 2);
+    }
 
 }
 
