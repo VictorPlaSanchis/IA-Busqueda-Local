@@ -38,8 +38,20 @@ public class EnergiaBoard {
     //ArrayList para almacenar las centrales
     private static Centrales centrales;
 
+    private static int centralesSeed;
+
+    private static int[] tiposCentral;
+
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
+
+    private static int nClientes;
+
+    private static double[] propClientes;
+
+    private static double propGarant;
+
+    private static int clientesSeed;
 
     private static ArrayList<Cliente> clientesG;
 
@@ -52,9 +64,32 @@ public class EnergiaBoard {
 
     private Random random;
 
+    public EnergiaBoard(EnergiaBoard estado){
+        nCentrales = estado.nCentrales;
+        nGarantizados = estado.nGarantizados;
+        nNoGarantizados = estado.nNoGarantizados;
+        try {
+            centrales = new Centrales(estado.tiposCentral, estado.centralesSeed);
+            clientes = new Clientes(estado.nClientes, estado.propClientes, estado.propGarant, estado.clientesSeed);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e);
+        }
+        clientesG = new ArrayList<Cliente>(estado.clientesG);
+        clientesNoG = new ArrayList<Cliente>(estado.clientesNoG);
+        energiaPendiente = new ArrayList<Double>(estado.energiaPendiente);
+        asignacionG = new ArrayList<Integer>(estado.asignacionG);
+        asignacionNG = new ArrayList<Integer>(estado.asignacionNG);
+    }
+
     /** Crea una nueva instancia de EnergiaBoard */
     public EnergiaBoard(int[] cent, int centralesSeed, int ncl, double[] propc, double propg, int clientesSeed) {
-
+        this.centralesSeed = centralesSeed;
+        this.tiposCentral = cent;
+        this.nClientes = ncl;
+        this.propClientes = propc;
+        this.propGarant = propg;
+        this.clientesSeed = clientesSeed;
         try{
             centrales =  new Centrales(cent, centralesSeed);
             clientes = new Clientes(ncl, propc, propg, clientesSeed);
@@ -317,8 +352,62 @@ public class EnergiaBoard {
         return false;
 
     }
+    public boolean isGoalState() {
+        return false;
+    }
 
+    public double calculaLogPotenciaRemanente() {
+        double potencia = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        for (int i = 0; i < nNoGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        return Math.log(potencia);
+    }
 
+    public double calculaPowPotenciaRemanente() {
+        double potencia = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        for (int i = 0; i < nNoGarantizados; ++i) {
+            potencia += energiaPendiente.get(asignacionG.get(i));
+        }
+        return Math.pow(potencia, 2);
+    }
+
+    public double calculaCosteTransporte() {
+        double coste = 0.0;
+        for (int i = 0; i < nGarantizados; ++i) {
+            if (asignacionG.get(i) != -1) {
+                coste += calculaProduccionDistancia(clientesG.get(i), centrales.get(asignacionG.get(i)));
+            }
+        }
+        for (int i = 0; i < nNoGarantizados; ++i) {
+            if (asignacionNG.get(i) != -1) {
+                coste += calculaProduccionDistancia(clientesNoG.get(i), centrales.get(asignacionNG.get(i)));
+            }
+        }
+        return coste;
+    }
+
+    public double calculaLogCosteIndemnización(){
+        double coste=0.0;
+        for(int i=0; i<nCentrales; ++i){
+            coste += calculaCoste(i);
+        }
+        return Math.log(coste + this.calculaIndemnizacion());
+    }
+
+    public double calculaPowCosteIndemnización(){
+        double coste=0.0;
+        for(int i=0; i<nCentrales; ++i){
+            coste += calculaCoste(i);
+        }
+        return Math.pow((coste + this.calculaIndemnizacion()), 2);
+    }
 
 }
 
