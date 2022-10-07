@@ -40,8 +40,18 @@ public class EnergiaBoard {
 
     private static int centralesSeed;
 
+    private static int[] tiposCentral;
+
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
+
+    private static int nClientes;
+
+    private static double[] propClientes;
+
+    private static double propGarant;
+
+    private static int clientesSeed;
 
     private static ArrayList<Cliente> clientesG;
 
@@ -54,11 +64,32 @@ public class EnergiaBoard {
 
     private Random random;
 
-
+    public EnergiaBoard(EnergiaBoard estado){
+        nCentrales = estado.nCentrales;
+        nGarantizados = estado.nGarantizados;
+        nNoGarantizados = estado.nNoGarantizados;
+        try {
+            centrales = new Centrales(estado.tiposCentral, estado.centralesSeed);
+            clientes = new Clientes(estado.nClientes, estado.propClientes, estado.propGarant, estado.clientesSeed);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e);
+        }
+        clientesG = new ArrayList<Cliente>(estado.clientesG);
+        clientesNoG = new ArrayList<Cliente>(estado.clientesNoG);
+        energiaPendiente = new ArrayList<Double>(estado.energiaPendiente);
+        asignacionG = new ArrayList<Integer>(estado.asignacionG);
+        asignacionNG = new ArrayList<Integer>(estado.asignacionNG);
+    }
 
     /** Crea una nueva instancia de EnergiaBoard */
     public EnergiaBoard(int[] cent, int centralesSeed, int ncl, double[] propc, double propg, int clientesSeed) {
-
+        this.centralesSeed = centralesSeed;
+        this.tiposCentral = cent;
+        this.nClientes = ncl;
+        this.propClientes = propc;
+        this.propGarant = propg;
+        this.clientesSeed = clientesSeed;
         try{
             centrales =  new Centrales(cent, centralesSeed);
             clientes = new Clientes(ncl, propc, propg, clientesSeed);
