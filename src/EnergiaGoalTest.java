@@ -11,6 +11,7 @@ public class EnergiaGoalTest implements GoalTest {
 			goalState = estat.getGarantizados().get(i) != -1;
 			++i;
 		}
-		return goalState; // sha dimplementar aqui
+		//return goalState;
+		return false; // sha dimplementar aqui
 	}
 }
