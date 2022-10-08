@@ -39,6 +39,10 @@ public class EnergiaBoard {
     private static ArrayList<Cliente> clientesG;
     //ArrayList para almacenar los clientes no garantizados
     private static ArrayList<Cliente> clientesNoG;
+    //Creadora de succesors
+    EnergiaSuccessorFunction energiaSuccessorFunction;
+    //Evaluadora de estado final
+    EnergiaGoalTest energiaGoalTest;
 
     public ArrayList<Double> getEnergiaPendiente() {
         return energiaPendiente;
@@ -81,6 +85,8 @@ public class EnergiaBoard {
         asignacionG = new ArrayList<Integer>();
         asignacionNG = new ArrayList<Integer>();
         random = new Random();
+        energiaSuccessorFunction = new EnergiaSuccessorFunction();
+        energiaGoalTest = new EnergiaGoalTest();
     }
 
     public EnergiaBoard(ArrayList<Cliente> clientesG, ArrayList<Cliente> clientesNoG, ArrayList<Integer> asignacionG, ArrayList<Integer> asignacionNG, ArrayList<Double> energiaPendiente){
@@ -293,7 +299,7 @@ public class EnergiaBoard {
     public boolean canSwapCliente(Cliente cl1, Cliente cl2, int indexCentral1, int indexCentral2){
 
         Central c1 = indexCentral1==-1 ? null : centrales.get(indexCentral1);
-        Central c2 = indexCentral1==-1 ? null : centrales.get(indexCentral2);
+        Central c2 = indexCentral2==-1 ? null : centrales.get(indexCentral2);
 
         double energiaP1 = indexCentral1==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral1);
         double energiaP2 = indexCentral2==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral2);
