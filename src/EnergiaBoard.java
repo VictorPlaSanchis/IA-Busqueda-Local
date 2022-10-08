@@ -424,15 +424,5 @@ public class EnergiaBoard implements Cloneable{
         return heuristicFunctionSelected;
     }
 
-    public Object copyOf(EnergiaBoard board) {
-        try{
-            return super.clone();
-        } catch (Exception e) {
-            System.out.println("Clone of EnergiaBoard went wrong.");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }
 
