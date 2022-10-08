@@ -8,6 +8,8 @@ import IA.Energia.Central;
 import IA.Energia.Centrales;
 import IA.Energia.Cliente;
 import IA.Energia.Clientes;
+import aima.search.framework.HeuristicFunction;
+import aima.search.framework.SuccessorFunction;
 
 /**
  *
@@ -18,7 +20,7 @@ import IA.Energia.Clientes;
 /**
  * Clase para la representación del problema IA-Energia
  * */
-public class EnergiaBoard {
+public class EnergiaBoard implements Cloneable{
     public EnergiaBoard(){};
 
     public int getnCentrales() {
@@ -43,6 +45,8 @@ public class EnergiaBoard {
     EnergiaSuccessorFunction energiaSuccessorFunction;
     //Evaluadora de estado final
     EnergiaGoalTest energiaGoalTest;
+    //Heuristic functions
+    ArrayList<HeuristicFunction> heuristicFunctions;
 
     public ArrayList<Double> getEnergiaPendiente() {
         return energiaPendiente;
@@ -87,6 +91,12 @@ public class EnergiaBoard {
         random = new Random();
         energiaSuccessorFunction = new EnergiaSuccessorFunction();
         energiaGoalTest = new EnergiaGoalTest();
+        heuristicFunctions = new ArrayList<>();
+        heuristicFunctions.add(new EnergiaHeuristicFunction1());
+        heuristicFunctions.add(new EnergiaHeuristicFunction2());
+        heuristicFunctions.add(new EnergiaHeuristicFunction3());
+        heuristicFunctions.add(new EnergiaHeuristicFunction4());
+        heuristicFunctions.add(new EnergiaHeuristicFunction5());
     }
 
     public EnergiaBoard(ArrayList<Cliente> clientesG, ArrayList<Cliente> clientesNoG, ArrayList<Integer> asignacionG, ArrayList<Integer> asignacionNG, ArrayList<Double> energiaPendiente){
@@ -403,7 +413,26 @@ public class EnergiaBoard {
         return clientesNoG;
     }
 
+    public SuccessorFunction getSuccessorFunction() {
+        SuccessorFunction successorFunctionSelected = energiaSuccessorFunction;
+        return successorFunctionSelected;
+    }
 
+    public HeuristicFunction getHeuristicFunction(int index) {
+        HeuristicFunction heuristicFunctionSelected = heuristicFunctions.get(index);
+        // TODO: Es podria fer una seleccio intelligent sobre quina heuristica agafar...
+        return heuristicFunctionSelected;
+    }
+
+    public Object copyOf(EnergiaBoard board) {
+        try{
+            return super.clone();
+        } catch (Exception e) {
+            System.out.println("Clone of EnergiaBoard went wrong.");
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
 

@@ -66,8 +66,9 @@ public class BusquedaLocal {
             Random randoml = new Random();
             Problem problem = new Problem(
                     (EnergiaBoard)board,
-                    board.energiaSuccessorFunction,
-                    board.energiaGoalTest
+                    board.getSuccessorFunction(),
+                    board.energiaGoalTest,
+                    board.getHeuristicFunction(0)
             );
             Search search = new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
