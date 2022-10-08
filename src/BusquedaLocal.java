@@ -63,12 +63,11 @@ public class BusquedaLocal {
 
         System.out.println("Starting being uwu...");
         try{
-            Random randoml = new Random();
             Problem problem = new Problem(
                     (EnergiaBoard)board,
                     board.getSuccessorFunction(),
                     board.energiaGoalTest,
-                    board.getHeuristicFunction(0)
+                    board.getHeuristicFunction(4)
             );
             Search search = new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);

@@ -21,7 +21,6 @@ import aima.search.framework.SuccessorFunction;
  * Clase para la representación del problema IA-Energia
  * */
 public class EnergiaBoard implements Cloneable{
-    public EnergiaBoard(){};
 
     public int getnCentrales() {
         return nCentrales;
@@ -61,6 +60,9 @@ public class EnergiaBoard implements Cloneable{
     private Random random;
 
     /** Crea una nueva instancia de EnergiaBoard */
+
+    public EnergiaBoard(){};
+
     public EnergiaBoard(int[] cent, int centralesSeed, int ncl, double[] propc, double propg, int clientesSeed) {
         try{
             centrales =  new Centrales(cent, centralesSeed);
@@ -99,12 +101,35 @@ public class EnergiaBoard implements Cloneable{
         heuristicFunctions.add(new EnergiaHeuristicFunction5());
     }
 
-    public EnergiaBoard(ArrayList<Cliente> clientesG, ArrayList<Cliente> clientesNoG, ArrayList<Integer> asignacionG, ArrayList<Integer> asignacionNG, ArrayList<Double> energiaPendiente){
-        this.energiaPendiente = energiaPendiente;
-        this.clientesG=clientesG;
-        this.clientesNoG=clientesNoG;
-        this.asignacionG=asignacionG;
-        this.asignacionNG=asignacionNG;
+    /*public EnergiaBoard(ArrayList<Cliente> clientesG, ArrayList<Cliente> clientesNoG, ArrayList<Integer> asignacionG, ArrayList<Integer> asignacionNG, ArrayList<Double> energiaPendiente){
+
+        this.energiaPendiente = new ArrayList<>(energiaPendiente);
+        for(int i=0; i<energiaPendiente.size(); i++) this.energiaPendiente.add(energiaPendiente.get(i));
+        this.clientesG = new ArrayList<>(clientesG.size());
+        for(int i=0; i<clientesG.size(); i++) this.clientesG.add(clientesG.get(i));
+        this.clientesNoG= new ArrayList<>(clientesNoG.size());
+        for(int i=0; i<clientesNoG.size(); i++) this.clientesNoG.add(clientesNoG.get(i));
+        this.asignacionG = new ArrayList<>(asignacionG);
+        //for(int i=0; i<asignacionG.size(); i++) this.asignacionG.add(new Integer(asignacionG.get(i)));
+        this.asignacionNG = new ArrayList<>();
+        for(int i=0; i<asignacionNG.size(); i++) this.asignacionNG.add(asignacionNG.get(i));
+
+    }*/
+
+    public EnergiaBoard (EnergiaBoard parent){
+        //EnergiaBoard newBoard = new EnergiaBoard();
+        this.energiaPendiente = new ArrayList<>(parent.energiaPendiente);
+        this.asignacionG = new ArrayList<>(parent.asignacionG);
+        this.asignacionNG = new ArrayList<>(parent.asignacionNG);
+        this.clientesG = new ArrayList<>(parent.clientesG);
+        this.clientesNoG = new ArrayList<>(parent.clientesNoG);
+
+        /*newBoard.energiaPendiente = parent.energiaPendiente;
+        newBoard.asignacionG = parent.asignacionG;
+        newBoard.asignacionNG = parent.asignacionNG;
+        newBoard.clientesG = parent.clientesG;
+        newBoard.clientesNoG = parent.clientesNoG;*/
+        //return new newBoard;
     }
 
     private double calculaCoste(int indexCentral){
@@ -357,11 +382,15 @@ public class EnergiaBoard implements Cloneable{
 
     public double calculaPowPotenciaRemanente() {
         double potencia = 0.0;
-        for (int i = 0; i < nGarantizados; ++i) {
+        /*for (int i = 0; i < nGarantizados; ++i) {
             potencia += energiaPendiente.get(asignacionG.get(i));
         }
         for (int i = 0; i < nNoGarantizados; ++i) {
-            potencia += energiaPendiente.get(asignacionG.get(i));
+            potencia += energiaPendiente.get(asignacionNG.get(i));
+        }*/
+        int nCentrales = getnCentrales();
+        for(int i=0; i<nCentrales; ++i){
+            potencia+=energiaPendiente.get(i);
         }
         return Math.pow(potencia, 2);
     }

@@ -10,7 +10,7 @@ public class EnergiaHeuristicFunction3 implements HeuristicFunction {
     public double getHeuristicValue(Object state) {
         EnergiaBoard estat = (EnergiaBoard) state;
 
-        return estat.calculaPowPotenciaRemanente();
+        return -estat.calculaPowPotenciaRemanente();
     }
 
 }
