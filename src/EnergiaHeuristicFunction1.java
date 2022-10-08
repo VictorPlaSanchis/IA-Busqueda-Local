@@ -7,11 +7,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import aima.search.framework.HeuristicFunction;
 
-/**
- *
- * @author Houda El Fezzak Bekkouri
- */
-
 
 /**
  * Clase para la representación del problema IA-Energia

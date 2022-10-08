@@ -1,9 +1,5 @@
 import aima.search.framework.HeuristicFunction;
 
-/**
- *
- * @author Houda El Fezzak Bekkouri
- */
 
 
 /**
