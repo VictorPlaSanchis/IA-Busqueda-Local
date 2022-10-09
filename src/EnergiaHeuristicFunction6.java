@@ -1,16 +1,15 @@
 import aima.search.framework.HeuristicFunction;
 
 
-
 /**
  * Clase para la representación del problema IA-Energia
  * */
-public class EnergiaHeuristicFunction5 implements HeuristicFunction {
+public class EnergiaHeuristicFunction6 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
-        //HEURISTICA 2: MINIMIZAR EL CUADRADO DE LA SUMA DEL COSTE MAS LA INDEMNIZACION
+        //HEURISTICA 2: MINIMIZAR LA ENERGIA QUE SE PIERDE
         EnergiaBoard estat = (EnergiaBoard) state;
-        return -(Math.pow(estat.calculaCosteMasIndemnizacion(),2));
+        return -(Math.log((estat.calculaEnergiaPerdida())));
     }
 
 }

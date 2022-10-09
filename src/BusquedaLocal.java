@@ -59,7 +59,7 @@ public class BusquedaLocal {
                 new double[]{0.25,0.30,0.45},
                 0.75,
                 0 );
-        board.generarEstadoInicial(1);
+        board.generarEstadoInicial(2);
 
         System.out.println("Starting being uwu...");
         try{
@@ -67,7 +67,7 @@ public class BusquedaLocal {
                     (EnergiaBoard)board,
                     board.getSuccessorFunction(),
                     board.energiaGoalTest,
-                    board.getHeuristicFunction(1)
+                    board.getHeuristicFunction(5)
             );
             Search search = new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
