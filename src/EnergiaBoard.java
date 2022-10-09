@@ -26,6 +26,10 @@ public class EnergiaBoard implements Cloneable{
         return nCentrales;
     }
 
+    // Solo para debug, lo eliminaremos mas tarde
+    public static int timesExpanded = 0;
+    public static int timesOperated = 0;
+
     //Numero de centrales electricas
     private static int nCentrales;
     //Numero de clientes garantizados
@@ -37,9 +41,9 @@ public class EnergiaBoard implements Cloneable{
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
     //ArrayList para almacenar los clientes garantizados
-    private static ArrayList<Cliente> clientesG;
+    private ArrayList<Cliente> clientesG;
     //ArrayList para almacenar los clientes no garantizados
-    private static ArrayList<Cliente> clientesNoG;
+    private ArrayList<Cliente> clientesNoG;
     //Creadora de succesors
     EnergiaSuccessorFunction energiaSuccessorFunction;
     //Evaluadora de estado final
@@ -52,11 +56,11 @@ public class EnergiaBoard implements Cloneable{
     }
 
     //ArrayList para almacenar la energia pendiente de asignar de la central iésima
-    private static ArrayList<Double> energiaPendiente;
+    private ArrayList<Double> energiaPendiente;
     //ArrayList para almacenar la asignación de central al cliente garantizado iésimo
-    private static ArrayList<Integer> asignacionG;
+    private ArrayList<Integer> asignacionG;
     //ArrayList para almacenar la asignación de central al cliente no garantizado iésimo
-    private static ArrayList<Integer> asignacionNG;
+    private ArrayList<Integer> asignacionNG;
     private Random random;
 
     /** Crea una nueva instancia de EnergiaBoard */
@@ -117,19 +121,16 @@ public class EnergiaBoard implements Cloneable{
     }*/
 
     public EnergiaBoard (EnergiaBoard parent){
-        //EnergiaBoard newBoard = new EnergiaBoard();
-        this.energiaPendiente = new ArrayList<>(parent.energiaPendiente);
-        this.asignacionG = new ArrayList<>(parent.asignacionG);
-        this.asignacionNG = new ArrayList<>(parent.asignacionNG);
-        this.clientesG = new ArrayList<>(parent.clientesG);
-        this.clientesNoG = new ArrayList<>(parent.clientesNoG);
-
-        /*newBoard.energiaPendiente = parent.energiaPendiente;
-        newBoard.asignacionG = parent.asignacionG;
-        newBoard.asignacionNG = parent.asignacionNG;
-        newBoard.clientesG = parent.clientesG;
-        newBoard.clientesNoG = parent.clientesNoG;*/
-        //return new newBoard;
+        energiaPendiente = new ArrayList<>();
+        for(Double energia : parent.energiaPendiente) energiaPendiente.add(energia);
+        asignacionG = new ArrayList<>();
+        for(Integer integer : parent.asignacionG) asignacionG.add(integer);
+        asignacionNG = new ArrayList<>();
+        for(Integer integer : parent.asignacionNG) asignacionNG.add(integer);
+        clientesG = new ArrayList<>();
+        for(Cliente cliente : parent.clientesG) clientesG.add(cliente);
+        clientesNoG = new ArrayList<>();
+        for(Cliente cliente : parent.clientesNoG) clientesNoG.add(cliente);
     }
 
     private double calculaCoste(int indexCentral){
@@ -333,6 +334,12 @@ public class EnergiaBoard implements Cloneable{
 
     public boolean canSwapCliente(Cliente cl1, Cliente cl2, int indexCentral1, int indexCentral2){
 
+        timesOperated++;
+        if(timesOperated%Math.pow(nGarantizados+nNoGarantizados,2) == 0) {
+            timesExpanded += 1;
+            System.out.println(timesExpanded);
+        }
+
         Central c1 = indexCentral1==-1 ? null : centrales.get(indexCentral1);
         Central c2 = indexCentral2==-1 ? null : centrales.get(indexCentral2);
 
@@ -410,7 +417,7 @@ public class EnergiaBoard implements Cloneable{
         return coste;
     }
 
-    public double calculaLogCosteIndemnización(){
+    public double calculaLogCosteIndemnizacion(){
         double coste=0.0;
         for(int i=0; i<nCentrales; ++i){
             coste += calculaCoste(i);
@@ -418,7 +425,7 @@ public class EnergiaBoard implements Cloneable{
         return Math.log(coste + this.calculaIndemnizacion());
     }
 
-    public double calculaPowCosteIndemnización(){
+    public double calculaPowCosteIndemnizacion(){
         double coste=0.0;
         for(int i=0; i<nCentrales; ++i){
             coste += calculaCoste(i);

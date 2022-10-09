@@ -3,6 +3,7 @@ import aima.search.framework.GoalTest;
 
 public class EnergiaGoalTest implements GoalTest {
 	public boolean isGoalState(Object aState) {
+		return false;
 		/*EnergiaBoard estat = (EnergiaBoard) aState;
 		boolean goalState = true;
 		int n = estat.getGarantizados().size();
@@ -10,8 +11,8 @@ public class EnergiaGoalTest implements GoalTest {
 		while(goalState && i<n) {
 			goalState = estat.getGarantizados().get(i) != -1;
 			++i;
-		}*/
-		//return goalState;
-		return false; // sha dimplementar aqui
+		}
+		return goalState;
+		//return false; // sha dimplementar aqui*/
 	}
 }

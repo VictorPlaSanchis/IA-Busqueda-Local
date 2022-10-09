@@ -10,7 +10,7 @@ public class EnergiaHeuristicFunction5 implements HeuristicFunction {
     public double getHeuristicValue(Object state) {
         EnergiaBoard estat = (EnergiaBoard) state;
 
-        return -estat.calculaPowCosteIndemnización();
+        return -estat.calculaPowCosteIndemnizacion();
     }
 
 }

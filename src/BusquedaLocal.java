@@ -67,7 +67,7 @@ public class BusquedaLocal {
                     (EnergiaBoard)board,
                     board.getSuccessorFunction(),
                     board.energiaGoalTest,
-                    board.getHeuristicFunction(4)
+                    board.getHeuristicFunction(1)
             );
             Search search = new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem,search);
@@ -76,16 +76,9 @@ public class BusquedaLocal {
         }
         catch (Exception e) {
             e.printStackTrace();
-        };
+        }
 
-
-        /*
-        uwu.generarEstadoInicial(1)
-
-        System.out.println(uwu.calculaBeneficios());
-        */
-
-        System.out.println("uwu...");
+        System.out.println("uwu ended");
 
     }
 }
