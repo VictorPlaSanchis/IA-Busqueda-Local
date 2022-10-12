@@ -38,9 +38,9 @@ public class EnergiaBoard implements Cloneable{
     //ArrayList para almacenar los clientes
     private static Clientes clientes;
     //ArrayList para almacenar los clientes garantizados
-    private static ArrayList<Cliente> clientesG;
+    private ArrayList<Cliente> clientesG;
     //ArrayList para almacenar los clientes no garantizados
-    private static ArrayList<Cliente> clientesNoG;
+    private ArrayList<Cliente> clientesNoG;
     //Creadora de succesors
     EnergiaSuccessorFunction energiaSuccessorFunction;
     //Evaluadora de estado final
@@ -48,7 +48,7 @@ public class EnergiaBoard implements Cloneable{
     //Heuristic functions
     ArrayList<HeuristicFunction> heuristicFunctions;
     //ArrayList para almacenar la energia pendiente de asignar de la central iésima
-    //private ArrayList<Double> energiaPendiente;
+    private ArrayList<Double> energiaPendiente;
     //ArrayList para almacenar la asignación de central al cliente garantizado iésimo
     private ArrayList<Integer> asignacionG;
     //ArrayList para almacenar la asignación de central al cliente no garantizado iésimo
@@ -80,10 +80,10 @@ public class EnergiaBoard implements Cloneable{
         nNoGarantizados = clientesNoG.size();
 
         nCentrales = centrales.size();
-        //energiaPendiente = new ArrayList<Double>();
-        /*for(int i = 0; i<nCentrales; ++i){
+        energiaPendiente = new ArrayList<Double>();
+        for(int i = 0; i<nCentrales; ++i){
             energiaPendiente.add(centrales.get(i).getProduccion());
-        }*/
+        }
         asignacionG = new ArrayList<Integer>();
         asignacionNG = new ArrayList<Integer>();
         random = new Random();
@@ -98,35 +98,24 @@ public class EnergiaBoard implements Cloneable{
         heuristicFunctions.add(new EnergiaHeuristicFunction6());
     }
     public EnergiaBoard (EnergiaBoard parent){
-        //energiaPendiente = new ArrayList<>();
-        //for(Double energia : parent.energiaPendiente) energiaPendiente.add(energia);
+        energiaPendiente = new ArrayList<>();
+        for(Double energia : parent.energiaPendiente) energiaPendiente.add(energia);
         asignacionG = new ArrayList<>();
         for(Integer integer : parent.asignacionG) asignacionG.add(integer);
         asignacionNG = new ArrayList<>();
         for(Integer integer : parent.asignacionNG) asignacionNG.add(integer);
-        //clientesG = new ArrayList<>();
-        //for(Cliente cliente : parent.clientesG) clientesG.add(cliente);
-        //clientesNoG = new ArrayList<>();
-        //for(Cliente cliente : parent.clientesNoG) clientesNoG.add(cliente);
+        clientesG = new ArrayList<>();
+        for(Cliente cliente : parent.clientesG) clientesG.add(cliente);
+        clientesNoG = new ArrayList<>();
+        for(Cliente cliente : parent.clientesNoG) clientesNoG.add(cliente);
     }
 
     //GETTERS
     public int getnCentrales() {
         return nCentrales;
     }
-    /*public ArrayList<Double> getEnergiaPendiente() {
+    public ArrayList<Double> getEnergiaPendiente() {
         return energiaPendiente;
-    }*/
-
-    public double getEnergiaPendiente(int indexCentral) {
-        double produccionTotal=centrales.get(indexCentral).getProduccion();
-        for(int i=0; i<asignacionG.size(); ++i){
-            if(asignacionG.get(i)==indexCentral) produccionTotal-=calculaProduccionDistancia(clientesG.get(i),centrales.get(indexCentral));
-        }
-        for(int i=0; i<asignacionNG.size(); ++i){
-            if(asignacionNG.get(i)==indexCentral) produccionTotal-=calculaProduccionDistancia(clientesNoG.get(i),centrales.get(indexCentral));
-        }
-        return produccionTotal;
     }
     public ArrayList<Integer> getGarantizados() { return asignacionG;}
     public ArrayList<Integer> getNGarantizados() { return asignacionNG;}
@@ -145,7 +134,7 @@ public class EnergiaBoard implements Cloneable{
     //CALCULOS
     private double calculaCoste(int indexCentral){
         //La central no ha producido
-        if(getEnergiaPendiente(indexCentral)==centrales.get(indexCentral).getProduccion()){
+        if(energiaPendiente.get(indexCentral)==centrales.get(indexCentral).getProduccion()){
             return switch (centrales.get(indexCentral).getTipo()) {
                 case Central.CENTRALA -> 15000.0;
                 case Central.CENTRALB -> 5000.0;
@@ -230,7 +219,7 @@ public class EnergiaBoard implements Cloneable{
     public double calculaPotenciaRemanente() {
         double potencia = 0.0;
         for (int i = 0; i < nCentrales; ++i) {
-            potencia += getEnergiaPendiente(i);
+            potencia += energiaPendiente.get(i);
         }
         return potencia;
     }
@@ -284,8 +273,10 @@ public class EnergiaBoard implements Cloneable{
         int indexCentral = 0;
         while(i<nGarantizados && indexCentral<nCentrales){
             double produccionCliente = calculaProduccionDistancia(clientesG.get(i),centrales.get(indexCentral));
-            if(getEnergiaPendiente(indexCentral)>=produccionCliente){
+            if(energiaPendiente.get(indexCentral)>=produccionCliente){
                 asignacionG.add(indexCentral);
+                energiaActualizada = energiaPendiente.get(indexCentral) - produccionCliente;
+                energiaPendiente.set(indexCentral, energiaActualizada);
                 ++i;
             }
             else ++indexCentral;
@@ -305,8 +296,10 @@ public class EnergiaBoard implements Cloneable{
             i=0;
             while(i<nNoGarantizados && indexCentral<nCentrales){
                 double produccionCliente = calculaProduccionDistancia(clientesNoG.get(i),centrales.get(indexCentral));
-                if(getEnergiaPendiente(indexCentral)>=produccionCliente){
+                if(energiaPendiente.get(indexCentral)>=produccionCliente){
                     asignacionNG.add(indexCentral);
+                    energiaActualizada = energiaPendiente.get(indexCentral) - produccionCliente;
+                    energiaPendiente.set(indexCentral, energiaActualizada);
                     ++i;
                 }
                 else ++indexCentral;
@@ -327,7 +320,7 @@ public class EnergiaBoard implements Cloneable{
             int nuevaCentral = random.nextInt(0,nCentrales-1);
             int iteraciones = 0;
             double consumoCliente = calculaProduccionDistancia(cliente, centrales.get(nuevaCentral));
-            while(getEnergiaPendiente(nuevaCentral)<consumoCliente) {
+            while(energiaPendiente.get(nuevaCentral)<consumoCliente) {
                 nuevaCentral = random.nextInt(nCentrales);
                 consumoCliente = calculaProduccionDistancia(cliente, centrales.get(nuevaCentral));
                 if(iteraciones > nCentrales * 3) {
@@ -336,13 +329,14 @@ public class EnergiaBoard implements Cloneable{
                 }
                 iteraciones++;
             }
+            if(nuevaCentral !=-1) energiaPendiente.set(nuevaCentral, energiaPendiente.get(nuevaCentral) - consumoCliente);
             asignacionG.add(nuevaCentral);
         }
         for(Cliente cliente : clientesNoG){
             int nuevaCentral = random.nextInt(nCentrales);
             int iteraciones = 0;
             double consumoCliente = calculaProduccionDistancia(cliente, centrales.get(nuevaCentral));
-            while(getEnergiaPendiente(nuevaCentral)<consumoCliente) {
+            while(energiaPendiente.get(nuevaCentral)<consumoCliente) {
                 nuevaCentral = random.nextInt(nCentrales);
                 consumoCliente = calculaProduccionDistancia(cliente, centrales.get(nuevaCentral));
                 if(iteraciones > nCentrales) {
@@ -351,6 +345,7 @@ public class EnergiaBoard implements Cloneable{
                 }
                 iteraciones++;
             }
+            if(nuevaCentral !=-1) energiaPendiente.set(nuevaCentral, energiaPendiente.get(nuevaCentral) - consumoCliente);
             asignacionNG.add(nuevaCentral);
         }
     }
@@ -360,13 +355,17 @@ public class EnergiaBoard implements Cloneable{
             double distanciaCercana=Double.MAX_VALUE;
             for(int j=0; j<nCentrales; ++j){
                 if(distanciaCercana>calculaDistancia(clientesG.get(i),centrales.get(j))
-                        && getEnergiaPendiente(j)>=calculaProduccionDistancia(clientesG.get(i),centrales.get(j))){
+                        && energiaPendiente.get(j)>=calculaProduccionDistancia(clientesG.get(i),centrales.get(j))){
                     distanciaCercana = calculaDistancia(clientesG.get(i),centrales.get(j));
                     indexCentralCercana = j;
                 }
             }
-
-            asignacionG.add(indexCentralCercana);
+            if (indexCentralCercana==-1) asignacionG.add(-1);
+            else{
+                double consumo = calculaProduccionDistancia(clientesG.get(i),centrales.get(indexCentralCercana));
+                energiaPendiente.set(indexCentralCercana,energiaPendiente.get(indexCentralCercana)-consumo);
+                asignacionG.add(indexCentralCercana);
+            }
 
         }
 
@@ -375,12 +374,18 @@ public class EnergiaBoard implements Cloneable{
             double distanciaCercana=Double.MAX_VALUE;
             for(int j=0; j<nCentrales; ++j){
                 if(distanciaCercana>calculaDistancia(clientesNoG.get(i),centrales.get(j))
-                        && getEnergiaPendiente(j)>=calculaProduccionDistancia(clientesNoG.get(i),centrales.get(j))){
+                        && energiaPendiente.get(j)>=calculaProduccionDistancia(clientesNoG.get(i),centrales.get(j))){
                     distanciaCercana = calculaDistancia(clientesNoG.get(i),centrales.get(j));
                     indexCentralCercana = j;
                 }
             }
-            asignacionNG.add(indexCentralCercana);
+            if(indexCentralCercana==-1) asignacionNG.add(-1);
+            else{
+                double consumo = calculaProduccionDistancia(clientesNoG.get(i),centrales.get(indexCentralCercana));
+                energiaPendiente.set(indexCentralCercana,energiaPendiente.get(indexCentralCercana)-consumo);
+                asignacionNG.add(indexCentralCercana);
+            }
+
         }
     }
     public void generarEstadoInicial(int opt){
@@ -405,9 +410,9 @@ public class EnergiaBoard implements Cloneable{
     //OPERADORES
     public boolean canMoveClient(Cliente cl1, int indexCliente, int indexCentral){
         if (cl1.getContrato()==Cliente.GARANTIZADO && indexCentral!=-1)
-            return calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= getEnergiaPendiente(indexCentral);
+            return calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendiente.get(indexCentral);
         if(cl1.getContrato()==Cliente.NOGARANTIZADO)
-            return indexCentral == -1 || calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= getEnergiaPendiente(indexCentral);
+            return indexCentral == -1 || calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendiente.get(indexCentral);
         return false;
     }
     public void moveClient(Cliente cl1, int indexCliente, int indexCentral){
@@ -425,8 +430,8 @@ public class EnergiaBoard implements Cloneable{
         Central c1 = indexCentral1==-1 ? null : centrales.get(indexCentral1);
         Central c2 = indexCentral2==-1 ? null : centrales.get(indexCentral2);
 
-        double energiaP1 = indexCentral1==-1  ? Double.MAX_VALUE : getEnergiaPendiente(indexCentral1);
-        double energiaP2 = indexCentral2==-1  ? Double.MAX_VALUE : getEnergiaPendiente(indexCentral2);
+        double energiaP1 = indexCentral1==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral1);
+        double energiaP2 = indexCentral2==-1  ? Double.MAX_VALUE : energiaPendiente.get(indexCentral2);
 
         double consumoC1 = c1==null ? 0.0 : calculaProduccionDistancia(cl1,c1);
         double consumoC2 = c2==null ? 0.0 : calculaProduccionDistancia(cl2,c2);
