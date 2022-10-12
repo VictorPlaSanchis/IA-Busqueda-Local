@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BusquedaLocal {
 
-    private static ArrayList<Integer> defaultParams = new ArrayList<>(Arrays.asList(0,5,5,10,15,1,1000,25,30,45,75,0,1));
+    private static ArrayList<Integer> defaultParams = new ArrayList<>(Arrays.asList(0,5,5,10,15,1234,1000,25,30,45,75,1234,2));
     private static HashMap<String, Integer> paramsTranslator = new HashMap<String, Integer>() {{
         put("-a", 0);
         put("-h", 1);
