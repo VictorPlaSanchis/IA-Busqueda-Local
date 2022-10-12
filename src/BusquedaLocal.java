@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BusquedaLocal {
 
-    private static ArrayList<Integer> defaultParams = new ArrayList<>(Arrays.asList(0,5,5,10,15,1,1000,25,30,45,75,0,2));
+    private static ArrayList<Integer> defaultParams = new ArrayList<>(Arrays.asList(0,5,5,10,15,1,1000,25,30,45,75,0,1));
     private static HashMap<String, Integer> paramsTranslator = new HashMap<String, Integer>() {{
         put("-a", 0);
         put("-h", 1);
@@ -69,7 +69,7 @@ public class BusquedaLocal {
             SearchAgent searchAgent = new SearchAgent(problem,search);
             printActions(searchAgent.getActions());
             printInstrumentation(searchAgent.getInstrumentation());
-            return new EnergiaBoard();//(EnergiaBoard) searchAgent.getGoalState();
+            return (EnergiaBoard) search.getGoalState();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -112,7 +112,7 @@ public class BusquedaLocal {
             long end_time = System.nanoTime();
             double diff = (end_time-start_time) / 1e6;
             System.out.println("Temps: " + (diff/1e3) + " segons.");
-            //System.out.println("Beneficis de la solucio: " + solution.calculaBeneficios());
+            System.out.println("Beneficis de la solucio: " + solution.calculaBeneficios());
         }
         catch (Exception e) {
             e.printStackTrace();
