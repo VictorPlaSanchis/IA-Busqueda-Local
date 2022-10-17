@@ -7,12 +7,35 @@ import aima.search.informed.DepthLimitedSearch;
 import aima.search.informed.HillClimbingSearch;
 import aima.util.Pair;
 
+import java.io.FileWriter;
+import java.util.Scanner;
+import java.io.File;  // Import the File class
+import java.io.IOException;  // Import the IOException class to handle errors
+
 import java.util.*;
 
 
 public class BusquedaLocal {
 
-    private static ArrayList<Integer> defaultParams = new ArrayList<>(Arrays.asList(0,5,5,10,15,1234,1000,25,30,45,75,1234,2));
+    private static ArrayList<Integer> defaultParams = new ArrayList<>(
+            Arrays.asList(
+                    0,      // -a: algorisme (0: HillClimbing, 1: Simulated Annealing)
+                    5,      // -h: heuristica (minimitzar lenergia perduda)
+                    5,      // -nCt1: numero centrals tipus A
+                    10,     // -nCt2: numero centrals tipus B
+                    25,     // -nCt3: numero centrals tipus C
+                    1234,      // -CtSeed: SEED de centrals
+                    1000,   // -nCl: numero de clients
+                    25,     // -pCl1: proporcio clients tipus XG
+                    30,     // -pCl2: proporcio clients tipus MG
+                    45,     // -pCl3: proporcio clients tipus G
+                    75,     // -pG: proporcio de clients Garantitzats
+                    1234,      // -ClSeed: SEED de clients
+                    2,      // -EI: Estat Inicial
+                    2,       // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
+                    0
+            )
+    );
     private static HashMap<String, Integer> paramsTranslator = new HashMap<String, Integer>() {{
         put("-a", 0);
         put("-h", 1);
@@ -27,6 +50,8 @@ public class BusquedaLocal {
         put("-pG", 10);
         put("-ClSeed", 11);
         put("-EI", 12);
+        put("-sw", 13);
+        put("-idexe", 14);
     }};
     /*
     * Param1 : "-a" : 0(HillClimbing) 1(SimulatedAnnealing)
@@ -40,7 +65,7 @@ public class BusquedaLocal {
             for(int i=0; i<args.length; i += 2) {
                 params.set(paramsTranslator.get(args[i]), Integer.valueOf(args[i+1]));
             }
-            System.out.println(params);
+            //System.out.println(params);
             return params;
         }
     }
@@ -51,8 +76,8 @@ public class BusquedaLocal {
             String key = (String) keys.next();
             String property = properties.getProperty(key);
             System.out.println(key + " : " + property);
+            pasos = property;
         }
-
     }
 
     private static void printActions(List actions) {
@@ -61,6 +86,8 @@ public class BusquedaLocal {
             System.out.println(action);
         }
     }
+
+    static String pasos;
 
     private static EnergiaBoard hillClimbing(EnergiaBoard board, int heuristicParam){
         try {
@@ -77,10 +104,13 @@ public class BusquedaLocal {
         return null;
     }
 
-    public static void main(String[] args){
 
+
+    public static void main(String[] args) throws IOException {
 
         ArrayList<Integer> params = readParams(args);
+
+        EnergiaSuccessorFunction.option = params.get(paramsTranslator.get("-sw"));
 
         EnergiaBoard board = new EnergiaBoard(
                 new int[]{params.get(paramsTranslator.get("-nCt1")), params.get(paramsTranslator.get("-nCt2")), params.get(paramsTranslator.get("-nCt3"))},
@@ -90,7 +120,8 @@ public class BusquedaLocal {
                 params.get(paramsTranslator.get("-pG")) / 100.0,
                 params.get(paramsTranslator.get("-ClSeed")));
         board.generarEstadoInicial(params.get(paramsTranslator.get("-EI")));
-
+        double bei = board.calculaBeneficios();
+        System.out.println("Beneficios estado inicial:" + bei);
         try{
             Problem problem = new Problem(
                     (EnergiaBoard)board,
@@ -113,9 +144,28 @@ public class BusquedaLocal {
             double diff = (end_time-start_time) / 1e6;
             System.out.println("Temps: " + (diff/1e3) + " segons.");
             System.out.println("Beneficis de la solucio: " + solution.calculaBeneficios());
+            System.out.println("Ganancia de beneficios: " + (solution.calculaBeneficios() - bei));
+
+            int clientsAsignats = 0;
+            for(Integer central : solution.getGarantizados()) {
+                if(central >= 0) clientsAsignats++;
+            }
+            for(Integer central : solution.getNGarantizados()) {
+                if(central >= 0) clientsAsignats++;
+            }
+            System.out.println("Clients servits: " + clientsAsignats);
+
+            FileWriter myWriter = new FileWriter("CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
+            myWriter.write((diff/1e3)+"\n");
+            myWriter.write(solution.calculaBeneficios()+"\n");
+            myWriter.write(pasos + "\n");
+            myWriter.write(clientsAsignats+" " );
+            myWriter.close();
+
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 }
