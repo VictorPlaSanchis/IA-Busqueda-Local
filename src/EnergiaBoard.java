@@ -435,17 +435,15 @@ public class EnergiaBoard implements Cloneable{
         if (cl1.getContrato()==Cliente.GARANTIZADO && indexCentral!=-1)
             return (getGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral);
         if(cl1.getContrato()==Cliente.NOGARANTIZADO)
-            return indexCentral == -1 || ((getGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral));
+            return indexCentral == -1 || ((getNGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral));
         return false;
     }
     public void moveClient(Cliente cl1, int indexCliente, int indexCentral){
         if (cl1.getContrato()==Cliente.GARANTIZADO ) {
             asignacionG.set(indexCliente, indexCentral);
-            //energiaPendienteCentral.set(indexCentral, energiaPendienteCentral.get(indexCentral) + calculaProduccionDistancia(cl1, centrales.get(indexCentral)));
         }
         else {
             asignacionNG.set(indexCliente, indexCentral);
-            //energiaPendienteCentral.set(indexCentral, energiaPendienteCentral.get(indexCentral) + calculaProduccionDistancia(cl1, centrales.get(indexCentral)));
         }
     }
     public boolean canSwapCliente(Cliente cl1, Cliente cl2, int indexCentral1, int indexCentral2){

@@ -4,6 +4,8 @@
       <root url="jar://$PROJECT_DIR$/dist/AIMA.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/dist/AIMA.jar!/" />
+    </SOURCES>
   </library>
 </component>

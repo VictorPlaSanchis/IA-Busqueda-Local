@@ -59,10 +59,10 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 			for (int i = 0; i < nNoGarantizados; ++i) {
 				for (int j = 0; j < nNoGarantizados; ++j) {
 					if (i == j) continue;
-					if (board.canSwapCliente(clientesG.get(i), clientesG.get(j), board.getGarantizados().get(i), board.getGarantizados().get(j))) {
+					if (board.canSwapCliente(clientesNoG.get(i), clientesNoG.get(j), board.getNGarantizados().get(i), board.getNGarantizados().get(j))) {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
-						newBoard.swapCliente(clientesG.get(i), clientesG.get(j), i, j, board.getGarantizados().get(i), board.getGarantizados().get(j));
+						newBoard.swapCliente(clientesNoG.get(i), clientesNoG.get(j), i, j, board.getNGarantizados().get(i), board.getNGarantizados().get(j));
 						successors.add(new Successor("SWAP ACTION", newBoard));
 					}
 				}
@@ -74,12 +74,7 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 			for (int i = 0; i < nGarantizados; ++i) {
 				for (int j = 0; j < board.getnCentrales(); ++j) {
 					//Pasamos a la funcion move: Cliente, index cliente e index central
-					Integer indexCentral = board.getGarantizados().get(i);
-					double energia;
-					if(indexCentral == -1) energia = 0.0;
-					else energia = actualEnergiaPendiente.get(indexCentral);
-					if (board.canMoveClient(clientesG.get(i), i, indexCentral, energia)) {
-						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
+					if (board.canMoveClient(clientesG.get(i), i, j, actualEnergiaPendiente.get(j))) {
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.moveClient(clientesG.get(i), i, j);
 						successors.add(new Successor("MOVE ACTION", newBoard));
@@ -88,19 +83,19 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 			}
 			//Aplicant l'operador de move para clientes no garantizados
 			for (int i = 0; i < nNoGarantizados; ++i) {
-				for (int j = 0; j < board.getnCentrales(); ++j) {
+				for (int j = -1; j < board.getnCentrales(); ++j) {
 					//Pasamos a la funcion move: Cliente, index cliente e index central
-					Integer indexCentral = board.getNGarantizados().get(i);
 					double energia;
-					if(indexCentral == -1) energia = 0.0;
-					else energia = actualEnergiaPendiente.get(indexCentral);
-					if (board.canMoveClient(clientesNoG.get(i), i, indexCentral, energia)) {
+					if(j == -1) energia = 0.0;
+					else energia = actualEnergiaPendiente.get(j);
+					if (board.canMoveClient(clientesNoG.get(i), i, j, energia)) {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.moveClient(clientesNoG.get(i), i, j);
 						successors.add(new Successor("MOVE ACTION", newBoard));
 					}
 				}
+
 			}
 		}
 

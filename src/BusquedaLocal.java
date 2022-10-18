@@ -20,7 +20,7 @@ public class BusquedaLocal {
     private static ArrayList<Integer> defaultParams = new ArrayList<>(
             Arrays.asList(
                     0,      // -a: algorisme (0: HillClimbing, 1: Simulated Annealing)
-                    5,      // -h: heuristica (minimitzar lenergia perduda)
+                    0,      // -h: heuristica (minimitzar lenergia perduda)
                     5,      // -nCt1: numero centrals tipus A
                     10,     // -nCt2: numero centrals tipus B
                     25,     // -nCt3: numero centrals tipus C
@@ -155,7 +155,7 @@ public class BusquedaLocal {
             }
             System.out.println("Clients servits: " + clientsAsignats);
 
-            FileWriter myWriter = new FileWriter("CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
+            FileWriter myWriter = new FileWriter("SW_"+params.get(paramsTranslator.get("-sw"))+"_EI_"+params.get(paramsTranslator.get("-EI"))+"_CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
             myWriter.write((diff/1e3)+"\n");
             myWriter.write(solution.calculaBeneficios()+"\n");
             myWriter.write(pasos + "\n");
