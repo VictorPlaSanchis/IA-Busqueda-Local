@@ -5,6 +5,7 @@ import aima.search.framework.SearchAgent;
 import aima.search.framework.SuccessorFunction;
 import aima.search.informed.DepthLimitedSearch;
 import aima.search.informed.HillClimbingSearch;
+import aima.search.informed.SimulatedAnnealingSearch;
 import aima.util.Pair;
 
 import java.io.FileWriter;
@@ -35,7 +36,12 @@ public class BusquedaLocal {
                     1,// -ClSeed: SEED de clients
                     0,   // -EI: Estat Inicial
                     2,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
-                                0 // -idexe: identificador dexecucio (per experiments amb parametres iguals)
+                                0, // -idexe: identificador dexecucio (per experiments amb parametres iguals)
+                    // PARAMETRES SA
+                        0,  // -steps: paramatre de SA, steps de lalgorisme
+                        0,  // -k: paramtre de SA
+                        0,  // -lamb: paramatre de SA
+                        0   // -stiter: paramatre de SA
             )
     );
     private static HashMap<String, Integer> paramsTranslator = new HashMap<String, Integer>() {{
@@ -54,6 +60,10 @@ public class BusquedaLocal {
         put("-EI", 12);
         put("-sw", 13);
         put("-idexe", 14);
+        put("-steps", 15);
+        put("-k", 16);
+        put("-lamb", 17);
+        put("-stiter", 18);
     }};
     /*
     * Param1 : "-a" : 0(HillClimbing) 1(SimulatedAnnealing)
@@ -106,11 +116,25 @@ public class BusquedaLocal {
         return null;
     }
 
+    private static EnergiaBoard simulatedAnnealing(EnergiaBoard board, int stiter, int k, double lamb, int heuristicParam) {
+        try {
+            Problem problem = new Problem(board, board.getSuccessorFunction(), new EnergiaGoalTest(), board.getHeuristicFunction(heuristicParam));
+            Search search = new SimulatedAnnealingSearch(params.get(paramsTranslator.get("-steps")),stiter,k,lamb);
+            SearchAgent agent = new SearchAgent(problem, search);
 
+            printActions(agent.getActions());
+            printInstrumentation(agent.getInstrumentation());
+            return (EnergiaBoard) search.getGoalState();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
+    static ArrayList<Integer> params;
     public static void main(String[] args) throws IOException {
 
-        ArrayList<Integer> params = readParams(args);
+        params = readParams(args);
 
         EnergiaSuccessorFunction.option = params.get(paramsTranslator.get("-sw"));
 
@@ -126,26 +150,30 @@ public class BusquedaLocal {
         double bei = board.calculaBeneficios();
         System.out.println("Beneficios estado inicial:" + bei);
         try{
-            Problem problem = new Problem(
-                    (EnergiaBoard)board,
-                    board.getSuccessorFunction(),
-                    board.energiaGoalTest,
-                    board.getHeuristicFunction(5)
-            );
 
             long start_time = System.nanoTime();
             EnergiaBoard solution = null;
             // HillClimbing
             if(params.get(paramsTranslator.get("-a")) == 0) {
-                solution = hillClimbing(board,params.get(paramsTranslator.get("-h")));
+                solution = hillClimbing(
+                        board,
+                        params.get(paramsTranslator.get("-h"))
+                );
             }
             // SimulatedAnnealing
             else if(params.get(paramsTranslator.get("-a")) == 1) {
-                solution = hillClimbing(board,params.get(paramsTranslator.get("-h")));
+                solution = simulatedAnnealing(
+                        board,
+                        params.get(paramsTranslator.get("-stiter")),
+                        params.get(paramsTranslator.get("-k")),
+                        params.get(paramsTranslator.get("-lamb")),
+                        params.get(paramsTranslator.get("-h"))
+                );
             }
             long end_time = System.nanoTime();
             double diff = (end_time-start_time) / 1e6;
             System.out.println("Temps: " + (diff/1e3) + " segons.");
+            assert solution != null; // recomenacio de IntellIJ, entenc que fa una excepcio si solution == null !
             System.out.println("Beneficis de la solucio: " + solution.calculaBeneficios());
             System.out.println("Ganancia de beneficios: " + (solution.calculaBeneficios() - bei));
 
