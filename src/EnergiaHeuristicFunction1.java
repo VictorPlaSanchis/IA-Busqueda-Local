@@ -12,10 +12,10 @@ import aima.search.framework.HeuristicFunction;
  * Clase para la representación del problema IA-Energia
  * */
 public class EnergiaHeuristicFunction1 implements HeuristicFunction {
-    //HEURISTICA 1: MINIMIZAR EL BENEFICIO (INGRESOS-COSTES-INDEMNIZACION) TOTAL DE LAS CENTRALES
+    //HEURISTICA 1: MAXIMIZAR EL BENEFICIO (INGRESOS-COSTES-INDEMNIZACION) TOTAL DE LAS CENTRALES
     public double getHeuristicValue(Object state) {
         EnergiaBoard estat = (EnergiaBoard) state;
-        return estat.calculaBeneficios();
+        return -estat.calculaBeneficios();
     }
 
 

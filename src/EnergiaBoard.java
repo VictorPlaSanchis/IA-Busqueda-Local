@@ -75,11 +75,6 @@ public class EnergiaBoard implements Cloneable{
         nNoGarantizados = clientesNoG.size();
 
         nCentrales = centrales.size();
-        //energiaPendiente = new ArrayList<Double>();
-        //energiaPendienteCentral = new ArrayList<>();
-        //for(int i = 0; i<nCentrales; ++i){
-        //    energiaPendienteCentral.add(centrales.get(i).getProduccion());
-        //}
         asignacionG = new ArrayList<Integer>();
         asignacionNG = new ArrayList<Integer>();
         random = new Random();
@@ -95,21 +90,32 @@ public class EnergiaBoard implements Cloneable{
         heuristicFunctions.add(new EnergiaHeuristicFunction7());
     }
 
-    //ArrayList<Double> getEnergiaPendiente() { return energiaPendienteCentral; }
-
     public EnergiaBoard (EnergiaBoard parent){
         asignacionG = new ArrayList<>(parent.getGarantizados());
         asignacionNG = new ArrayList<>(parent.getNGarantizados());
-        //energiaPendienteCentral = new ArrayList<>(parent.getEnergiaPendiente());
     }
 
     //GETTERS
+
+    public int numeroAssignatsNoGarantitzats() {
+        int clientsAsignats = 0;
+        for(Integer central : getNGarantizados()) {
+            if(central >= 0) clientsAsignats++;
+        }
+        return clientsAsignats;
+    }
+
+    public int numeroAssignatsGarantitzats() {
+        int clientsAsignats = 0;
+        for(Integer central : this.asignacionG) {
+            if(central >= 0) clientsAsignats++;
+        }
+        return clientsAsignats;
+    }
+
     public int getnCentrales() {
         return nCentrales;
     }
-    /*public ArrayList<Double> getEnergiaPendiente() {
-        return energiaPendiente;
-    }*/
 
     public double getEnergiaPendiente(int indexCentral) {
         double produccionTotal=centrales.get(indexCentral).getProduccion();
@@ -119,6 +125,7 @@ public class EnergiaBoard implements Cloneable{
         for(int i=0; i<asignacionNG.size(); ++i){
             if(asignacionNG.get(i)==indexCentral) produccionTotal-=calculaProduccionDistancia(clientesNoG.get(i),centrales.get(indexCentral));
         }
+
         return produccionTotal;
     }
     public ArrayList<Integer> getGarantizados() { return asignacionG;}
@@ -231,7 +238,50 @@ public class EnergiaBoard implements Cloneable{
         else return consumo * (0.6 + 1.0);
     }
 
-    private double calculaDistancia(boolean garantitzat, int cliente, int central){
+    public double calculaDistancia(boolean garantitzat, int cliente, boolean garantitzat2, int cliente2){
+        double clienteCoordX, cliente2CoordX;
+        double clienteCoordY, cliente2CoordY;
+        if(garantitzat) {
+            if(garantitzat2) {
+                Cliente clienteObj = EnergiaBoard.clientesG.get(cliente);
+                Cliente clienteObj2 = EnergiaBoard.clientesG.get(cliente2);
+                clienteCoordX = clienteObj.getCoordX();
+                clienteCoordY = clienteObj.getCoordY();
+                cliente2CoordX = clienteObj2.getCoordX();
+                cliente2CoordY = clienteObj2.getCoordY();
+            } else {
+                Cliente clienteObj = EnergiaBoard.clientesG.get(cliente);
+                Cliente clienteObj2 = EnergiaBoard.clientesNoG.get(cliente2);
+                clienteCoordX = clienteObj.getCoordX();
+                clienteCoordY = clienteObj.getCoordY();
+                cliente2CoordX = clienteObj2.getCoordX();
+                cliente2CoordY = clienteObj2.getCoordY();
+            }
+
+        } else {
+            if(garantitzat2) {
+                Cliente clienteObj = EnergiaBoard.clientesNoG.get(cliente);
+                Cliente clienteObj2 = EnergiaBoard.clientesG.get(cliente2);
+                clienteCoordX = clienteObj.getCoordX();
+                clienteCoordY = clienteObj.getCoordY();
+                cliente2CoordX = clienteObj2.getCoordX();
+                cliente2CoordY = clienteObj2.getCoordY();
+            } else {
+                Cliente clienteObj = EnergiaBoard.clientesNoG.get(cliente);
+                Cliente clienteObj2 = EnergiaBoard.clientesNoG.get(cliente2);
+                clienteCoordX = clienteObj.getCoordX();
+                clienteCoordY = clienteObj.getCoordY();
+                cliente2CoordX = clienteObj2.getCoordX();
+                cliente2CoordY = clienteObj2.getCoordY();
+            }
+        }
+        return Math.sqrt(
+                Math.pow(clienteCoordX-cliente2CoordX,2)+
+                        Math.pow(clienteCoordY-cliente2CoordY,2)
+        );
+    }
+
+    public double calculaDistancia(boolean garantitzat, int cliente, int central){
         Central centralObj = EnergiaBoard.centrales.get(central);
         double clienteCoordX, centralCoordX = centralObj.getCoordX();
         double clienteCoordY, centralCoordY = centralObj.getCoordY();
@@ -427,12 +477,11 @@ public class EnergiaBoard implements Cloneable{
                 break;
 
         }
-        System.out.println("Generacion estado inicial done!");
     }
 
     //OPERADORES
     public boolean canMoveClient(Cliente cl1, int indexCliente, int indexCentral, double energiaPendienteCentral){
-        if (cl1.getContrato()==Cliente.GARANTIZADO && indexCentral!=-1)
+        if (cl1.getContrato()==Cliente.GARANTIZADO)
             return (getGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral);
         if(cl1.getContrato()==Cliente.NOGARANTIZADO)
             return indexCentral == -1 || ((getNGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral));
@@ -456,8 +505,13 @@ public class EnergiaBoard implements Cloneable{
 
         double consumoC1 = c1==null ? 0.0 : calculaProduccionDistancia(cl1,c1);
         double consumoC2 = c2==null ? 0.0 : calculaProduccionDistancia(cl2,c2);
+        double consumoC1toNewC2 = c2==null ? 0.0 : calculaProduccionDistancia(cl1,c2);
+        double consumoC2toNewC1 = c1==null ? 0.0 : calculaProduccionDistancia(cl2,c1);
 
-        boolean swap = (energiaP2+consumoC2)>=consumoC1 && (energiaP1+consumoC1)>=consumoC2;
+        double energiaP1Limpia = energiaP1 + consumoC1;
+        double energiaP2Limpia = energiaP2 + consumoC2;
+
+        boolean swap = (energiaP1Limpia - consumoC2toNewC1)>=0.0 && (energiaP2Limpia - consumoC1toNewC2)>=0.0;
         swap = swap && !((indexCentral1==-1 && cl2.getContrato()==Cliente.GARANTIZADO) || (indexCentral2==-1 && cl1.getContrato()==Cliente.GARANTIZADO));
         return swap;
     }
