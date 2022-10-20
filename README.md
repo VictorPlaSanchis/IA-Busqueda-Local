@@ -15,8 +15,6 @@ Librería con la implementación de algoritmos de IA en lenguaje Java.
 
 
 Maria Montalvo Falcon ( maria.montalvo@estudiantat.upc.edu )
-
-Houda El Fezzak Bekkouri ( houda.el.fezzak@estudiantat.upc.edu )
   
 Victor Pla Sanchis ( victor.pla@estudiantat.upc.edu )
 
