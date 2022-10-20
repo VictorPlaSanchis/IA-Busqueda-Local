@@ -8,6 +8,7 @@ import aima.search.framework.SuccessorFunction;
 public class EnergiaSuccessorFunction implements SuccessorFunction {
 
 	static int option;
+	static int heuristicValue;
 
 	public List getSuccessors(Object aState) {
 

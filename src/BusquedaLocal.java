@@ -137,6 +137,7 @@ public class BusquedaLocal {
         params = readParams(args);
 
         EnergiaSuccessorFunction.option = params.get(paramsTranslator.get("-sw"));
+        EnergiaSuccessorFunction.heuristicValue = params.get(paramsTranslator.get("-h"));
 
         EnergiaBoard board = new EnergiaBoard(
                 new int[]{params.get(paramsTranslator.get("-nCt1")), params.get(paramsTranslator.get("-nCt2")), params.get(paramsTranslator.get("-nCt3"))},
