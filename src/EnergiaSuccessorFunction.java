@@ -7,9 +7,6 @@ import aima.search.framework.SuccessorFunction;
 
 public class EnergiaSuccessorFunction implements SuccessorFunction {
 
-	static int option;
-	static int heuristicValue;
-
 	public List getSuccessors(Object aState) {
 
 		double DIST_MAX_SWAP = Double.MAX_VALUE;
@@ -31,16 +28,15 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 
 		//Aplicant l'operador de swap
 		boolean wantSwap = false; boolean wantMove = false;
-		if(option==0) {
-			//DIST_MAX_SWAP = 5.0;
-			//DIST_MAX_MOVE = 35.0;
+		if(BusquedaLocal.operadorEscollit == 0) {
+			DIST_MAX_SWAP = 5.0;
+			DIST_MAX_MOVE = 35.0;
 			wantSwap = true; wantMove = true;
 		}
-		if(option==1) {wantSwap = true; wantMove = false;}
-		if(option==2) {wantSwap = false; wantMove = true;}
+		if(BusquedaLocal.operadorEscollit ==1) {wantSwap = true; wantMove = false;}
+		if(BusquedaLocal.operadorEscollit ==2) {wantSwap = false; wantMove = true;}
 
 
-		ArrayList<Double> successorsMine = new ArrayList<>();
 
 		if(wantSwap) {
 			for (int i = 0; i < nGarantizados; ++i) {

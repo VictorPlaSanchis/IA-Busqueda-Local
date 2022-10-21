@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 import IA.Energia.Cliente;
 import aima.search.framework.Successor;
@@ -8,63 +9,126 @@ import aima.search.framework.SuccessorFunction;
 
 public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
 
-    static int option;
-    static int heuristica;
-
-
     public List getSuccessors(Object aState) {
-
         //ARRAY DE SUCCESSORS
         ArrayList<Successor> successors = new ArrayList<>();
 
         //ESTAT
         EnergiaBoard board = (EnergiaBoard) aState;
+        successors.add(new Successor("Random",getRandomSuccessor(board)));
+
+        return successors;
+    }
+
+    public EnergiaBoard getRandomSuccessor(EnergiaBoard board) {
+
+        EnergiaBoard successor = new EnergiaBoard(board);
+
+        double DIST_MAX_SWAP = Double.MAX_VALUE;
+        double DIST_MAX_MOVE = Double.MAX_VALUE;
+        if(BusquedaLocal.operadorEscollit==0) {
+            DIST_MAX_SWAP = 5.0;
+            DIST_MAX_MOVE = 35.0;
+        }
+
         int nGarantizados = board.getGarantizados().size();
         int nNoGarantizados = board.getNGarantizados().size();
+
         ArrayList<Cliente> clientesG = board.getClientesGarantizados();
         ArrayList<Cliente> clientesNoG = board.getClientesNGarantizados();
+
         ArrayList<Double> actualEnergiaPendiente = new ArrayList<>();
         for(int central = 0; central<board.getnCentrales(); central++) {
             actualEnergiaPendiente.add(board.getEnergiaPendiente(central));
         }
 
-
-        //SA
-
-        Random r = new Random();
-
-        //Energia: calidad de la solucion f(n)
-        double energiaActual = board.getHeuristicFunction(heuristica).getHeuristicValue(board);
-
-        //Temperatura: parametro de control
-        //Los valores de la temperatura y de como decrementa esta se escogen mediante experimentacion
-        double temperatura = 5;
-        int clienteG = (int) (Math.random()* board.getGarantizados().size());
-        int clienteNG = (int) (Math.random()* board.getNGarantizados().size());
-        //Mientras la temperatura no sea 0
-        while (temperatura>0){
-            //Para un numero prefijado de iteraciones hacer
-            for (int i=0; i< board.getnCentrales()*3;++i){
-                //Introducir algo random
-                int rd = r.nextInt(clienteG);
-                int rd2 = r.nextInt(clienteNG);
-                EnergiaBoard newBoard = new EnergiaBoard(board);
-                //FALTA APLICAR OPERADORES AQUI PARA GENERAR EL NEWBOARD
-                double energiaSucesor = board.getHeuristicFunction(heuristica).getHeuristicValue(board);
-                //Si es mejor lo cogemos
-                if(energiaSucesor>energiaActual) successors.add(new Successor("BETTER SUCCESSOR", newBoard));
-                //Si no es mejor lo cogemos con cierta probabilidad
-                else{
-                    double incrementoEnergia = energiaSucesor - energiaActual;
-                    double probabilidad = Math.pow(Math.E,incrementoEnergia/temperatura);
-                    if(probabilidad>0) successors.add(new Successor("RANDOM SUCCESSOR", newBoard));
-                }
-                temperatura-=0-01;
-
+        Random random = new Random();
+        boolean successorFound = false;
+        while(!successorFound) {
+            int operator = BusquedaLocal.operadorEscollit; // 0 = both, 1 = swap, 2 = move
+            if(operator==0) {
+                operator = random.nextInt(3);
             }
-        }
 
-        return successors;
+            if(operator == 1) {
+                System.out.println("SWAP");
+                int indexClient1;
+                int indexClient2;
+                boolean client1Garantizado = random.nextInt(3) == 1;
+                boolean client2Garantizado = random.nextInt(3) == 1;
+                if(client1Garantizado) indexClient1 = random.nextInt(nGarantizados);
+                else indexClient1 = random.nextInt(nNoGarantizados);
+                if(client2Garantizado) indexClient2 = random.nextInt(nGarantizados);
+                else indexClient2 = random.nextInt(nNoGarantizados);
+
+                EnergiaBoard newBoard = new EnergiaBoard(board);
+
+                Cliente cliente1;
+                Cliente cliente2;
+                int central1;
+                int central2;
+
+                if(client1Garantizado) {
+                    central1 = newBoard.getGarantizados().get(indexClient1);
+                    cliente1 = clientesG.get(indexClient1);
+                }
+                else {
+                    central1 = newBoard.getNGarantizados().get(indexClient1);
+                    cliente1 = clientesNoG.get(indexClient1);
+                }
+                if(client2Garantizado) {
+                    central2 = newBoard.getGarantizados().get(indexClient2);
+                    cliente2 = clientesG.get(indexClient2);
+                }
+                else {
+                    central2 = newBoard.getNGarantizados().get(indexClient2);
+                    cliente2 = clientesNoG.get(indexClient2);
+                }
+
+                // DIFERENTS
+                if(indexClient1 == indexClient2) continue;
+                // PODA DISTANCIA
+                if (newBoard.calculaDistancia(client1Garantizado, indexClient1,central1) > DIST_MAX_SWAP ||
+                        newBoard.calculaDistancia(client2Garantizado, indexClient2,central2) > DIST_MAX_SWAP) continue;
+                // CAN SWAP
+
+                if (newBoard.canSwapCliente(cliente1, cliente2, central1, central2)) {
+                    successorFound = true;
+                    newBoard.swapCliente(cliente1,cliente2,indexClient1,indexClient2,central1,central2);
+                    successor = newBoard;
+                } else continue;
+
+            } else if (operator == 2) {
+
+                EnergiaBoard newBoard = new EnergiaBoard(board);
+
+                int indexClient;
+                int indexCentral;
+                boolean client1Garantizado = random.nextInt(3) == 1;
+                if(client1Garantizado) {
+                    indexClient = random.nextInt(nGarantizados);
+                    indexCentral = newBoard.getGarantizados().get(indexClient);
+                }
+                else {
+                    indexClient = random.nextInt(nNoGarantizados);
+                    indexCentral = newBoard.getNGarantizados().get(indexClient);
+                }
+
+                if(board.calculaDistancia(client1Garantizado,indexClient,indexCentral) > DIST_MAX_MOVE) continue;
+                double energia;
+                if(indexCentral == -1) energia = 0.0;
+                else energia = actualEnergiaPendiente.get(indexCentral);
+                if(client1Garantizado && indexCentral == -1) continue;
+                if (board.canMoveClient(clientesG.get(indexClient), indexClient, indexCentral, energia)) {
+                    successorFound = true;
+                    newBoard.moveClient(clientesG.get(indexClient), indexClient, indexCentral);
+                    successor = newBoard;
+                }else {
+                    continue;
+                }
+            } else System.out.println("INVALID OPERATOR");
+        }
+        return successor;
     }
 
 }

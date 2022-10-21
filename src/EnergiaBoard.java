@@ -38,6 +38,7 @@ public class EnergiaBoard implements Cloneable{
     private static ArrayList<Cliente> clientesNoG;
     //Creadora de succesors
     static EnergiaSuccessorFunction energiaSuccessorFunction;
+    static EnergiaSuccessorFunctionSA energiaSuccessorFunctionSA;
     //Evaluadora de estado final
     static EnergiaGoalTest energiaGoalTest;
     //Heuristic functions
@@ -136,7 +137,11 @@ public class EnergiaBoard implements Cloneable{
         SuccessorFunction successorFunctionSelected = energiaSuccessorFunction;
         return successorFunctionSelected;
     }
-    public HeuristicFunction getHeuristicFunction(int index) {
+    public SuccessorFunction getSuccessorFunctionSA() {
+        SuccessorFunction successorFunctionSelected = new EnergiaSuccessorFunctionSA();
+        return successorFunctionSelected;
+    }
+    public static HeuristicFunction getHeuristicFunction(int index) {
         HeuristicFunction heuristicFunctionSelected = heuristicFunctions.get(index);
         // TODO: Es podria fer una seleccio intelligent sobre quina heuristica agafar...
         return heuristicFunctionSelected;
@@ -282,6 +287,7 @@ public class EnergiaBoard implements Cloneable{
     }
 
     public double calculaDistancia(boolean garantitzat, int cliente, int central){
+        if(central == -1) return 0.0;
         Central centralObj = EnergiaBoard.centrales.get(central);
         double clienteCoordX, centralCoordX = centralObj.getCoordX();
         double clienteCoordY, centralCoordY = centralObj.getCoordY();
@@ -481,8 +487,10 @@ public class EnergiaBoard implements Cloneable{
 
     //OPERADORES
     public boolean canMoveClient(Cliente cl1, int indexCliente, int indexCentral, double energiaPendienteCentral){
-        if (cl1.getContrato()==Cliente.GARANTIZADO)
+        if (cl1.getContrato()==Cliente.GARANTIZADO) {
+            if(indexCentral == -1) return false;
             return (getGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral);
+        }
         if(cl1.getContrato()==Cliente.NOGARANTIZADO)
             return indexCentral == -1 || ((getNGarantizados().get(indexCliente) != indexCentral) && (calculaProduccionDistancia(cl1, centrales.get(indexCentral)) <= energiaPendienteCentral));
         return false;

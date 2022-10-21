@@ -19,7 +19,8 @@ import java.util.*;
 public class BusquedaLocal {
 
     public static double beneficiInicial = 0.0;
-
+    public static int heuristicaEscollida = 0;
+    public static int operadorEscollit = 0;
     private static ArrayList<Integer> defaultParams = new ArrayList<>(
             Arrays.asList(
                                 0,                                  // -a: algorisme (0: HillClimbing, 1: Simulated Annealing)
@@ -27,21 +28,21 @@ public class BusquedaLocal {
                                 5,                                  // -nCt1: numero centrals tipus A
                                 10,                                 // -nCt2: numero centrals tipus B
                                 25,                                 // -nCt3: numero centrals tipus C
-                    1,// -CtSeed: SEED de centrals
+                    1,   // -CtSeed: SEED de centrals
                             1000,                                   // -nCl: numero de clients
                                 25,                                 // -pCl1: proporcio clients tipus XG
                                 30,                                 // -pCl2: proporcio clients tipus MG
                                 45,                                 // -pCl3: proporcio clients tipus G
                                 75,                                 // -pG: proporcio de clients Garantitzats
-                    1,// -ClSeed: SEED de clients
+                    1,   // -ClSeed: SEED de clients
                     0,   // -EI: Estat Inicial
-                    2,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
+                    0,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
                                 0, // -idexe: identificador dexecucio (per experiments amb parametres iguals)
                     // PARAMETRES SA
-                        0,  // -steps: paramatre de SA, steps de lalgorisme
-                        0,  // -k: paramtre de SA
-                        0,  // -lamb: paramatre de SA
-                        0   // -stiter: paramatre de SA
+                        100,  // -steps: paramatre de SA, steps de lalgorisme
+                        5,  // -k: paramtre de SA
+                        100,  // -lamb: paramatre de SA
+                        10   // -stiter: paramatre de SA
             )
     );
     private static HashMap<String, Integer> paramsTranslator = new HashMap<String, Integer>() {{
@@ -106,7 +107,8 @@ public class BusquedaLocal {
             Problem problem = new Problem(board, board.getSuccessorFunction(), new EnergiaGoalTest(), board.getHeuristicFunction(heuristicParam));
             Search search = new HillClimbingSearch();
             SearchAgent searchAgent = new SearchAgent(problem,search);
-            printActions(searchAgent.getActions());
+            //printActions(searchAgent.getActions());
+            System.out.println("Using HC");
             printInstrumentation(searchAgent.getInstrumentation());
             return (EnergiaBoard) search.getGoalState();
         }
@@ -118,11 +120,11 @@ public class BusquedaLocal {
 
     private static EnergiaBoard simulatedAnnealing(EnergiaBoard board, int stiter, int k, double lamb, int heuristicParam) {
         try {
-            Problem problem = new Problem(board, board.getSuccessorFunction(), new EnergiaGoalTest(), board.getHeuristicFunction(heuristicParam));
-            Search search = new SimulatedAnnealingSearch(params.get(paramsTranslator.get("-steps")),stiter,k,lamb);
+            Problem problem = new Problem(board, board.getSuccessorFunctionSA(), new EnergiaGoalTest(), board.getHeuristicFunction(heuristicParam));
+            Search search = new SimulatedAnnealingSearch(params.get(paramsTranslator.get("-steps")),stiter,k,1.0/lamb);
+            System.out.println("Using SA");
             SearchAgent agent = new SearchAgent(problem, search);
-
-            printActions(agent.getActions());
+            //printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
             return (EnergiaBoard) search.getGoalState();
         } catch (Exception e) {
@@ -136,8 +138,8 @@ public class BusquedaLocal {
 
         params = readParams(args);
 
-        EnergiaSuccessorFunction.option = params.get(paramsTranslator.get("-sw"));
-        EnergiaSuccessorFunction.heuristicValue = params.get(paramsTranslator.get("-h"));
+        operadorEscollit = params.get(paramsTranslator.get("-sw"));
+        heuristicaEscollida = params.get(paramsTranslator.get("-h"));
 
         EnergiaBoard board = new EnergiaBoard(
                 new int[]{params.get(paramsTranslator.get("-nCt1")), params.get(paramsTranslator.get("-nCt2")), params.get(paramsTranslator.get("-nCt3"))},
@@ -181,7 +183,7 @@ public class BusquedaLocal {
             int clientsAsignats = solution.numeroAssignatsGarantitzats() + solution.numeroAssignatsNoGarantitzats();
             System.out.println("Clients servits: " + clientsAsignats);
 
-            FileWriter myWriter = new FileWriter("SW_"+params.get(paramsTranslator.get("-sw"))+"_EI_"+params.get(paramsTranslator.get("-EI"))+"_CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
+            FileWriter myWriter = new FileWriter("H_"+params.get(paramsTranslator.get("-h"))+"_SW_"+params.get(paramsTranslator.get("-sw"))+"_EI_"+params.get(paramsTranslator.get("-EI"))+"_CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
             myWriter.write((diff/1e3)+"\n");
             myWriter.write(solution.calculaBeneficios()+"\n");
             myWriter.write(pasos + "\n");
