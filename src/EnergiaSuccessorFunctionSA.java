@@ -22,14 +22,8 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
 
     public EnergiaBoard getRandomSuccessor(EnergiaBoard board) {
 
-        EnergiaBoard successor = new EnergiaBoard(board);
-
         double DIST_MAX_SWAP = Double.MAX_VALUE;
         double DIST_MAX_MOVE = Double.MAX_VALUE;
-        if(BusquedaLocal.operadorEscollit==0) {
-            DIST_MAX_SWAP = 5.0;
-            DIST_MAX_MOVE = 35.0;
-        }
 
         int nGarantizados = board.getGarantizados().size();
         int nNoGarantizados = board.getNGarantizados().size();
@@ -37,31 +31,26 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
         ArrayList<Cliente> clientesG = board.getClientesGarantizados();
         ArrayList<Cliente> clientesNoG = board.getClientesNGarantizados();
 
-        ArrayList<Double> actualEnergiaPendiente = new ArrayList<>();
-        for(int central = 0; central<board.getnCentrales(); central++) {
-            actualEnergiaPendiente.add(board.getEnergiaPendiente(central));
-        }
-
         Random random = new Random();
-        boolean successorFound = false;
-        while(!successorFound) {
+        while(true) {
             int operator = BusquedaLocal.operadorEscollit; // 0 = both, 1 = swap, 2 = move
             if(operator==0) {
-                operator = random.nextInt(3);
-            }
+                operator = random.nextInt(2);
+            } else operator--;
 
-            if(operator == 1) {
-                System.out.println("SWAP");
+            if(operator == 0) {
+
+               // System.out.println("SWAP");
+
                 int indexClient1;
                 int indexClient2;
-                boolean client1Garantizado = random.nextInt(3) == 1;
-                boolean client2Garantizado = random.nextInt(3) == 1;
+                boolean client1Garantizado = random.nextInt(2) == 1;
+                boolean client2Garantizado = random.nextInt(2) == 1;
                 if(client1Garantizado) indexClient1 = random.nextInt(nGarantizados);
                 else indexClient1 = random.nextInt(nNoGarantizados);
                 if(client2Garantizado) indexClient2 = random.nextInt(nGarantizados);
                 else indexClient2 = random.nextInt(nNoGarantizados);
 
-                EnergiaBoard newBoard = new EnergiaBoard(board);
 
                 Cliente cliente1;
                 Cliente cliente2;
@@ -69,66 +58,66 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
                 int central2;
 
                 if(client1Garantizado) {
-                    central1 = newBoard.getGarantizados().get(indexClient1);
+                    central1 = board.getGarantizados().get(indexClient1);
                     cliente1 = clientesG.get(indexClient1);
                 }
                 else {
-                    central1 = newBoard.getNGarantizados().get(indexClient1);
+                    central1 = board.getNGarantizados().get(indexClient1);
                     cliente1 = clientesNoG.get(indexClient1);
                 }
                 if(client2Garantizado) {
-                    central2 = newBoard.getGarantizados().get(indexClient2);
+                    central2 = board.getGarantizados().get(indexClient2);
                     cliente2 = clientesG.get(indexClient2);
                 }
                 else {
-                    central2 = newBoard.getNGarantizados().get(indexClient2);
+                    central2 = board.getNGarantizados().get(indexClient2);
                     cliente2 = clientesNoG.get(indexClient2);
                 }
 
                 // DIFERENTS
                 if(indexClient1 == indexClient2) continue;
                 // PODA DISTANCIA
-                if (newBoard.calculaDistancia(client1Garantizado, indexClient1,central1) > DIST_MAX_SWAP ||
-                        newBoard.calculaDistancia(client2Garantizado, indexClient2,central2) > DIST_MAX_SWAP) continue;
+                if (board.calculaDistancia(client1Garantizado, indexClient1,central1) > DIST_MAX_SWAP ||
+                        board.calculaDistancia(client2Garantizado, indexClient2,central2) > DIST_MAX_SWAP) continue;
                 // CAN SWAP
 
-                if (newBoard.canSwapCliente(cliente1, cliente2, central1, central2)) {
-                    successorFound = true;
+                if (board.canSwapCliente(cliente1, cliente2, central1, central2)) {
+                    EnergiaBoard newBoard = new EnergiaBoard(board);
                     newBoard.swapCliente(cliente1,cliente2,indexClient1,indexClient2,central1,central2);
-                    successor = newBoard;
-                } else continue;
+                    return newBoard;
+                }
 
-            } else if (operator == 2) {
+            } else if (operator == 1) {
 
-                EnergiaBoard newBoard = new EnergiaBoard(board);
+                //System.out.println("MOVE");
 
+                double energia;
                 int indexClient;
                 int indexCentral;
-                boolean client1Garantizado = random.nextInt(3) == 1;
+                boolean client1Garantizado = random.nextInt(2) == 1;
+
                 if(client1Garantizado) {
                     indexClient = random.nextInt(nGarantizados);
-                    indexCentral = newBoard.getGarantizados().get(indexClient);
+                    indexCentral = random.nextInt(0, board.getnCentrales());
                 }
                 else {
                     indexClient = random.nextInt(nNoGarantizados);
-                    indexCentral = newBoard.getNGarantizados().get(indexClient);
+                    indexCentral = random.nextInt(-1, board.getnCentrales());
                 }
 
+                // PODA
                 if(board.calculaDistancia(client1Garantizado,indexClient,indexCentral) > DIST_MAX_MOVE) continue;
-                double energia;
+
+                // EXCEPCIO ENERGIA getEnergiaPendiente(-1)...
                 if(indexCentral == -1) energia = 0.0;
-                else energia = actualEnergiaPendiente.get(indexCentral);
-                if(client1Garantizado && indexCentral == -1) continue;
+                else energia = board.getEnergiaPendiente(indexCentral);
+
                 if (board.canMoveClient(clientesG.get(indexClient), indexClient, indexCentral, energia)) {
-                    successorFound = true;
+                    EnergiaBoard newBoard = new EnergiaBoard(board);
                     newBoard.moveClient(clientesG.get(indexClient), indexClient, indexCentral);
-                    successor = newBoard;
-                }else {
-                    continue;
+                    return newBoard;
                 }
             } else System.out.println("INVALID OPERATOR");
         }
-        return successor;
     }
-
 }

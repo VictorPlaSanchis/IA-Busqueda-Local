@@ -15,8 +15,8 @@ public class EnergiaHeuristicFunction7 implements HeuristicFunction {
         double A = estat.calculaBeneficios();
         double B = estat.calculaEnergiaPerdida();
         double C = estat.calculaPotenciaRemanente();
-        double pA = -1.0 / 100.0;
-        double pB = -1.0 / 0.01;
+        double pA = 1.0 / 100.0;
+        double pB = 1.0 / 0.01;
         double pC = 0.0;
 
         int penalitazcio = 0;

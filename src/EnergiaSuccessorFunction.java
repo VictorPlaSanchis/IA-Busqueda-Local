@@ -63,6 +63,7 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.swapCliente(clientesG.get(i), clientesNoG.get(j), i, j, board.getGarantizados().get(i), board.getNGarantizados().get(j));
+						if(board.getGarantizados().get(i) == -1 || board.getGarantizados().get(j) == -1) continue;
 						if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
 							continue;
 						}
