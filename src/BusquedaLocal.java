@@ -28,20 +28,20 @@ public class BusquedaLocal {
                                 5,                                  // -nCt1: numero centrals tipus A
                                 10,                                 // -nCt2: numero centrals tipus B
                                 25,                                 // -nCt3: numero centrals tipus C
-                    8,   // -CtSeed: SEED de centrals
-                            1000,                                   // -nCl: numero de clients
+                    1,   // -CtSeed: SEED de centrals
+                                1400,                                   // -nCl: numero de clients
                                 25,                                 // -pCl1: proporcio clients tipus XG
                                 30,                                 // -pCl2: proporcio clients tipus MG
                                 45,                                 // -pCl3: proporcio clients tipus G
                                 75,                                 // -pG: proporcio de clients Garantitzats
-                    8,   // -ClSeed: SEED de clients
-                    0,   // -EI: Estat Inicial
-                    0,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
+                    1,   // -ClSeed: SEED de clients
+                    1,   // -EI: Estat Inicial
+                    2,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
                                 0, // -idexe: identificador dexecucio (per experiments amb parametres iguals)
                     // PARAMETRES SA
-                        5000,  // -steps: paramatre de SA, steps de lalgorisme
+                        10000,  // -steps: paramatre de SA, steps de lalgorisme
                         30,  // -k: paramtre de SA
-                        100,  // -lamb: paramatre de SA
+                        1000,  // -lamb: paramatre de SA
                         10   // -stiter: paramatre de SA
             )
     );
@@ -183,7 +183,7 @@ public class BusquedaLocal {
             int clientsAsignats = solution.numeroAssignatsGarantitzats() + solution.numeroAssignatsNoGarantitzats();
             System.out.println("Clients servits: " + clientsAsignats);
 
-            FileWriter myWriter = new FileWriter("H_"+params.get(paramsTranslator.get("-h"))+"_SW_"+params.get(paramsTranslator.get("-sw"))+"_EI_"+params.get(paramsTranslator.get("-EI"))+"_CtSeed_"+params.get(paramsTranslator.get("-CtSeed"))+"_ClSeed_"+params.get(paramsTranslator.get("-ClSeed"))+"_"+params.get(paramsTranslator.get("-idexe"))+".txt");
+            FileWriter myWriter = new FileWriter(params.get(paramsTranslator.get("-nCl"))+".txt");
             myWriter.write((diff/1e3)+"\n");
             myWriter.write(solution.calculaBeneficios()+"\n");
             myWriter.write(pasos + "\n");

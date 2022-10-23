@@ -22,9 +22,6 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
 
     public EnergiaBoard getRandomSuccessor(EnergiaBoard board) {
 
-        double DIST_MAX_SWAP = Double.MAX_VALUE;
-        double DIST_MAX_MOVE = Double.MAX_VALUE;
-
         int nGarantizados = board.getGarantizados().size();
         int nNoGarantizados = board.getNGarantizados().size();
 
@@ -76,9 +73,7 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
 
                 // DIFERENTS
                 if(indexClient1 == indexClient2) continue;
-                // PODA DISTANCIA
-                if (board.calculaDistancia(client1Garantizado, indexClient1,central1) > DIST_MAX_SWAP ||
-                        board.calculaDistancia(client2Garantizado, indexClient2,central2) > DIST_MAX_SWAP) continue;
+
                 // CAN SWAP
 
                 if (board.canSwapCliente(cliente1, cliente2, central1, central2)) {
@@ -104,9 +99,6 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
                     indexClient = random.nextInt(nNoGarantizados);
                     indexCentral = random.nextInt(-1, board.getnCentrales());
                 }
-
-                // PODA
-                if(board.calculaDistancia(client1Garantizado,indexClient,indexCentral) > DIST_MAX_MOVE) continue;
 
                 // EXCEPCIO ENERGIA getEnergiaPendiente(-1)...
                 if(indexCentral == -1) energia = 0.0;

@@ -9,6 +9,9 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 
 	public List getSuccessors(Object aState) {
 
+		double numMillored = 0;
+		double numWorses = 0;
+
 		double DIST_MAX_SWAP = Double.MAX_VALUE;
 		double DIST_MAX_MOVE = Double.MAX_VALUE;
 
@@ -36,8 +39,6 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 		if(BusquedaLocal.operadorEscollit ==1) {wantSwap = true; wantMove = false;}
 		if(BusquedaLocal.operadorEscollit ==2) {wantSwap = false; wantMove = true;}
 
-
-
 		if(wantSwap) {
 			for (int i = 0; i < nGarantizados; ++i) {
 				for (int j = 0; j < nGarantizados; ++j) {
@@ -49,10 +50,13 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.swapCliente(clientesG.get(i), clientesG.get(j), i, j, board.getGarantizados().get(i), board.getGarantizados().get(j));
-						if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
-							continue;
-						}
+						//if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
+						//	continue;
+						//}
 						successors.add(new Successor("SWAP ACTION", newBoard));
+						//if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard) > EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board)) {
+						//	numMillored++;
+						//} else numWorses++;
 					}
 				}
 				for (int j = 0; j < nNoGarantizados; ++j) {
@@ -64,10 +68,13 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.swapCliente(clientesG.get(i), clientesNoG.get(j), i, j, board.getGarantizados().get(i), board.getNGarantizados().get(j));
 						if(board.getGarantizados().get(i) == -1 || board.getGarantizados().get(j) == -1) continue;
-						if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
-							continue;
-						}
+						//if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
+						//	continue;
+						//}
 						successors.add(new Successor("SWAP ACTION", newBoard));
+						//if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard) > EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board)) {
+						//	numMillored++;
+						//} else numWorses++;
 					}
 				}
 
@@ -83,10 +90,13 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.swapCliente(clientesNoG.get(i), clientesNoG.get(j), i, j, board.getNGarantizados().get(i), board.getNGarantizados().get(j));
-						if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
-							continue;
-						}
+						//if(newBoard.getEnergiaPendiente(board.getGarantizados().get(i)) < 0.0 || newBoard.getEnergiaPendiente(board.getGarantizados().get(j)) < 0.0 ) {
+						//	continue;
+						//}
 						successors.add(new Successor("SWAP ACTION", newBoard));
+						//if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard) > EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board)) {
+						//	numMillored++;
+						//} else numWorses++;
 					}
 				}
 			}
@@ -101,6 +111,9 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 					if (board.canMoveClient(clientesG.get(i), i, j, actualEnergiaPendiente.get(j))) {
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.moveClient(clientesG.get(i), i, j);
+						//if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard) > EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board)) {
+						//	numMillored++;
+						//} else numWorses++;
 						successors.add(new Successor("MOVE ACTION", newBoard));
 					}
 				}
@@ -117,13 +130,18 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 						//EnergiaBoard newBoard = new EnergiaBoard(board.getClientesGarantizados(),board.getClientesNGarantizados(),board.getGarantizados(),board.getNGarantizados(),board.getEnergiaPendiente());
 						EnergiaBoard newBoard = new EnergiaBoard (board);
 						newBoard.moveClient(clientesNoG.get(i), i, j);
+						//if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard) > EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board)) {
+						//	numMillored++;
+						//} else numWorses++;
 						successors.add(new Successor("MOVE ACTION", newBoard));
 					}
 				}
 
 			}
 		}
-
+		//double per = (((1.0*numMillored)/successors.size())*100);
+		//double per2 = (((1.0*numWorses)/successors.size())*100);
+		//System.out.println(per + ", " + per2 + ": (" + (per + per2) + ")");
 		//System.out.println("Succesors: " + successors.size()  + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
 		return successors;
 	}
