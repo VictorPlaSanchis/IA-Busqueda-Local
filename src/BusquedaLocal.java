@@ -184,6 +184,10 @@ public class BusquedaLocal {
             int clientsAsignats = solution.numeroAssignatsGarantitzats() + solution.numeroAssignatsNoGarantitzats();
             System.out.println("Clients servits: " + clientsAsignats);
 
+            System.out.println("Num Centrals A: " + solution.getCentralesA());
+            System.out.println("Num Centrals B: " + solution.getCentralesB());
+            System.out.println("Num Centrals C: " + solution.getCentralesC());
+
             FileWriter myWriter = new FileWriter(params.get(paramsTranslator.get("-nCl"))+".txt");
             myWriter.write((diff/1e3)+"\n");
             myWriter.write(solution.calculaBeneficios()+"\n");
