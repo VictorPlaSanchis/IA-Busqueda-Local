@@ -19,8 +19,8 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
         EnergiaBoard board = (EnergiaBoard) aState;
         successors.add(new Successor("Random",getRandomSuccessor(board)));
         if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board) > val) {
-            System.out.println(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board));
-            System.out.println("Succesors: " + successors.size() + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
+            //System.out.println(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board));
+            //System.out.println("Succesors: " + successors.size() + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
         }
 
         return successors;

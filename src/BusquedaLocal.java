@@ -28,14 +28,14 @@ public class BusquedaLocal {
                                 5,                                  // -nCt1: numero centrals tipus A
                                 10,                                 // -nCt2: numero centrals tipus B
                                 25,                                 // -nCt3: numero centrals tipus C
-                    1234,   // -CtSeed: SEED de centrals
+                    1234,   // -CtS0eed: SEED de centrals
                                 1000,                                   // -nCl: numero de clients
                                 25,                                 // -pCl1: proporcio clients tipus XG
                                 30,                                 // -pCl2: proporcio clients tipus MG
                                 45,                                 // -pCl3: proporcio clients tipus G
                                 75,                                 // -pG: proporcio de clients Garantitzats
                     1234,   // -ClSeed: SEED de clients
-                    3,   // -EI: Estat Inicial
+                    1,   // -EI: Estat Inicial
                     0,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
                                 0, // -idexe: identificador dexecucio (per experiments amb parametres iguals)
                     // PARAMETRES SA

@@ -572,10 +572,12 @@ public class EnergiaBoard implements Cloneable{
     public int getCentralesA(){
         int count = 0;
         for(Integer asignadoG : asignacionG) {
-            if(asignadoG == Central.CENTRALA) count++;
+            if(asignadoG==-1) continue;
+            if(centrales.get(asignadoG).getTipo() == Central.CENTRALA) count++;
         }
         for(Integer asignadoNG : asignacionNG) {
-            if(asignadoNG == Central.CENTRALA) count++;
+            if(asignadoNG==-1) continue;
+            if(centrales.get(asignadoNG).getTipo() == Central.CENTRALA) count++;
         }
         return count;
     }
@@ -583,10 +585,12 @@ public class EnergiaBoard implements Cloneable{
     public int getCentralesB(){
         int count = 0;
         for(Integer asignadoG : asignacionG) {
-            if(asignadoG == Central.CENTRALB) count++;
+            if(asignadoG==-1) continue;
+            if(centrales.get(asignadoG).getTipo() == Central.CENTRALB) count++;
         }
         for(Integer asignadoNG : asignacionNG) {
-            if(asignadoNG == Central.CENTRALB) count++;
+            if(asignadoNG==-1) continue;
+            if(centrales.get(asignadoNG).getTipo() == Central.CENTRALB) count++;
         }
         return count;
     }
@@ -594,10 +598,12 @@ public class EnergiaBoard implements Cloneable{
     public int getCentralesC(){
         int count = 0;
         for(Integer asignadoG : asignacionG) {
-            if(asignadoG == Central.CENTRALC) count++;
+            if(asignadoG==-1) continue;
+            if(centrales.get(asignadoG).getTipo()==Central.CENTRALC) count++;
         }
         for(Integer asignadoNG : asignacionNG) {
-            if(asignadoNG == Central.CENTRALC) count++;
+            if(asignadoNG==-1) continue;
+            if(centrales.get(asignadoNG).getTipo()==Central.CENTRALC) count++;
         }
         return count;
     }

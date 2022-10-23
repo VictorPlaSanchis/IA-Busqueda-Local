@@ -32,8 +32,8 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 		//Aplicant l'operador de swap
 		boolean wantSwap = false; boolean wantMove = false;
 		if(BusquedaLocal.operadorEscollit == 0) {
-			//DIST_MAX_SWAP = 5.0;
-			//DIST_MAX_MOVE = 35.0;
+			DIST_MAX_SWAP = 5.0;
+			DIST_MAX_MOVE = 35.0;
 			wantSwap = true; wantMove = true;
 		}
 		if(BusquedaLocal.operadorEscollit ==1) {wantSwap = true; wantMove = false;}
