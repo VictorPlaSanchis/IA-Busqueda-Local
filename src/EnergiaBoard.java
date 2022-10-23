@@ -50,7 +50,6 @@ public class EnergiaBoard implements Cloneable{
     //ArrayList para almacenar la asignación de central al cliente no garantizado iésimo
     private ArrayList<Integer> asignacionNG;
     private static Random random;
-
     /** Crea una nueva instancia de EnergiaBoard */
 
     //CONSTRUCTORAS
@@ -194,9 +193,9 @@ public class EnergiaBoard implements Cloneable{
         return ingresos;
     }
     private double calculaIndemnizacion(){
-        for(int i =0; i<nGarantizados; ++i){
-            if(asignacionG.get(i)==-1) return Double.MAX_VALUE;
-        }
+        //for(int i =0; i<nGarantizados; ++i){
+        //    if(asignacionG.get(i)==-1) return Double.MAX_VALUE;
+        //}
         double indemnizacion=0.0;
         for(int i =0; i<nNoGarantizados; ++i){
             if(asignacionNG.get(i)==-1) indemnizacion+=clientesNoG.get(i).getConsumo()*50.0;
@@ -208,7 +207,7 @@ public class EnergiaBoard implements Cloneable{
         double coste=0.0;
 
         double indemnizacion = calculaIndemnizacion();
-        if(indemnizacion==Double.MAX_VALUE) return -indemnizacion;
+        //if(indemnizacion==Double.MAX_VALUE) return -indemnizacion;
 
         for(int i=0; i<nCentrales; ++i){
             ingreso += calculaIngreso(i);
@@ -467,6 +466,19 @@ public class EnergiaBoard implements Cloneable{
             asignacionNG.add(indexCentralCercana);
         }
     }
+
+    public void generaEstadoInicial3(){
+        //Solución vacía
+        for(int i=0; i<nGarantizados; ++i){
+            asignacionG.add(-1);
+        }
+
+        for(int i=0; i<nNoGarantizados; ++i){
+            asignacionNG.add(-1);
+        }
+
+    }
+
     public void generarEstadoInicial(int opt){
         switch (opt){
             //Caso 0: colocar clientes en una central mientras la potencia remanente sea > 0
@@ -481,7 +493,10 @@ public class EnergiaBoard implements Cloneable{
             case 2:
                 generaEstadoInicial2();
                 break;
-
+            // Caso3: Experimento 5, solucion vacia
+            case 3:
+                generaEstadoInicial3();
+                break;
         }
     }
 
@@ -552,6 +567,17 @@ public class EnergiaBoard implements Cloneable{
     public void printPanicMethod(){
         System.out.println(asignacionG);
 
+    }
+
+    public int getCentralesA(){
+        int count = 0;
+        for(Integer asignadoG : asignacionG) {
+            if(asignadoG == 0) count++;
+        }
+        for(Integer asignadoNG : asignacionNG) {
+            if(asignadoNG == 0) count++;
+        }
+        return count;
     }
 }
 

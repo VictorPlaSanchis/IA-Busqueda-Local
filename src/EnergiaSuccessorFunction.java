@@ -32,8 +32,8 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 		//Aplicant l'operador de swap
 		boolean wantSwap = false; boolean wantMove = false;
 		if(BusquedaLocal.operadorEscollit == 0) {
-			DIST_MAX_SWAP = 5.0;
-			DIST_MAX_MOVE = 35.0;
+			//DIST_MAX_SWAP = 5.0;
+			//DIST_MAX_MOVE = 35.0;
 			wantSwap = true; wantMove = true;
 		}
 		if(BusquedaLocal.operadorEscollit ==1) {wantSwap = true; wantMove = false;}
@@ -42,7 +42,6 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 		if(wantSwap) {
 			for (int i = 0; i < nGarantizados; ++i) {
 				for (int j = 0; j < nGarantizados; ++j) {
-					//if (board.calculaDistancia(true, i,true,j) > DIST_MAX_SWAP) continue;
 					if (board.calculaDistancia(true, i,board.getGarantizados().get(j)) > DIST_MAX_SWAP ||
 							board.calculaDistancia(true, j,board.getGarantizados().get(i)) > DIST_MAX_SWAP) continue;
 					if (i == j) continue;
@@ -142,7 +141,8 @@ public class EnergiaSuccessorFunction implements SuccessorFunction {
 		//double per = (((1.0*numMillored)/successors.size())*100);
 		//double per2 = (((1.0*numWorses)/successors.size())*100);
 		//System.out.println(per + ", " + per2 + ": (" + (per + per2) + ")");
-		//System.out.println("Succesors: " + successors.size()  + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
+		System.out.println(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board));
+		System.out.println("Succesors: " + successors.size()  + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
 		return successors;
 	}
 

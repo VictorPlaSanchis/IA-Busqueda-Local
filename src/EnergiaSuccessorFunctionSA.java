@@ -9,6 +9,8 @@ import aima.search.framework.SuccessorFunction;
 
 public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
 
+    public static double val = 0.0;
+
     public List getSuccessors(Object aState) {
         //ARRAY DE SUCCESSORS
         ArrayList<Successor> successors = new ArrayList<>();
@@ -16,6 +18,10 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
         //ESTAT
         EnergiaBoard board = (EnergiaBoard) aState;
         successors.add(new Successor("Random",getRandomSuccessor(board)));
+        if(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board) > val) {
+            System.out.println(EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(board));
+            System.out.println("Succesors: " + successors.size() + ", Numero Garantitzats: " + board.numeroAssignatsGarantitzats() + ", Numero NO Garantitzats: " + board.numeroAssignatsNoGarantitzats());
+        }
 
         return successors;
     }
@@ -79,6 +85,7 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
                 if (board.canSwapCliente(cliente1, cliente2, central1, central2)) {
                     EnergiaBoard newBoard = new EnergiaBoard(board);
                     newBoard.swapCliente(cliente1,cliente2,indexClient1,indexClient2,central1,central2);
+                    val = EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard);
                     return newBoard;
                 }
 
@@ -107,6 +114,7 @@ public class EnergiaSuccessorFunctionSA implements SuccessorFunction {
                 if (board.canMoveClient(clientesG.get(indexClient), indexClient, indexCentral, energia)) {
                     EnergiaBoard newBoard = new EnergiaBoard(board);
                     newBoard.moveClient(clientesG.get(indexClient), indexClient, indexCentral);
+                    val = EnergiaBoard.getHeuristicFunction(BusquedaLocal.heuristicaEscollida).getHeuristicValue(newBoard);
                     return newBoard;
                 }
             } else System.out.println("INVALID OPERATOR");

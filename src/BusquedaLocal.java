@@ -24,23 +24,23 @@ public class BusquedaLocal {
     private static ArrayList<Integer> defaultParams = new ArrayList<>(
             Arrays.asList(
                                 0,                                  // -a: algorisme (0: HillClimbing, 1: Simulated Annealing)
-                    5,   // -h: heuristica (minimitzar lenergia perduda)
+                    0,   // -h: heuristica (minimitzar lenergia perduda)
                                 5,                                  // -nCt1: numero centrals tipus A
                                 10,                                 // -nCt2: numero centrals tipus B
                                 25,                                 // -nCt3: numero centrals tipus C
-                    1,   // -CtSeed: SEED de centrals
-                                1400,                                   // -nCl: numero de clients
+                    1234,   // -CtSeed: SEED de centrals
+                                1000,                                   // -nCl: numero de clients
                                 25,                                 // -pCl1: proporcio clients tipus XG
                                 30,                                 // -pCl2: proporcio clients tipus MG
                                 45,                                 // -pCl3: proporcio clients tipus G
                                 75,                                 // -pG: proporcio de clients Garantitzats
-                    1,   // -ClSeed: SEED de clients
-                    1,   // -EI: Estat Inicial
-                    2,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
+                    1234,   // -ClSeed: SEED de clients
+                    3,   // -EI: Estat Inicial
+                    0,   // -sw: SWAP or MOVE or BOTH (0: both, 1: swap, 2: move)
                                 0, // -idexe: identificador dexecucio (per experiments amb parametres iguals)
                     // PARAMETRES SA
-                        10000,  // -steps: paramatre de SA, steps de lalgorisme
-                        30,  // -k: paramtre de SA
+                        40000,  // -steps: paramatre de SA, steps de lalgorisme
+                        7,  // -k: paramtre de SA
                         1000,  // -lamb: paramatre de SA
                         10   // -stiter: paramatre de SA
             )
@@ -151,6 +151,7 @@ public class BusquedaLocal {
         board.generarEstadoInicial(params.get(paramsTranslator.get("-EI")));
         beneficiInicial = board.calculaBeneficios();
         double bei = board.calculaBeneficios();
+        System.out.println(board.getGarantizados().size());
         System.out.println("Beneficios estado inicial:" + bei);
         try{
 

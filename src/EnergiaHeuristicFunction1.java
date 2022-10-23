@@ -15,7 +15,9 @@ public class EnergiaHeuristicFunction1 implements HeuristicFunction {
     //HEURISTICA 1: MAXIMIZAR EL BENEFICIO (INGRESOS-COSTES-INDEMNIZACION) TOTAL DE LAS CENTRALES
     public double getHeuristicValue(Object state) {
         EnergiaBoard estat = (EnergiaBoard) state;
-        return -estat.calculaBeneficios();
+        double VALOR = 500000;
+        double penalitzacio = (estat.getGarantizados().size() - estat.numeroAssignatsGarantitzats());
+        return -estat.calculaBeneficios() + (penalitzacio * VALOR);
     }
 
 
